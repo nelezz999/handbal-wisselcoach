@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <title>Handbal WisselCoach</title>
+
 <link rel="manifest" href="manifest.json">
 
 <style>
@@ -71,7 +72,59 @@ select{
 .field{
     text-align:center;
 }
+.field-layout{
+    display:flex;
+    flex-direction:column;
+    gap:25px;
+}
 
+.field-row{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:8px;
+}
+
+.field-position{
+    background:#eef2f7;
+    border-radius:10px;
+    padding:10px 4px;
+    text-align:center;
+    min-height:78px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+}
+
+.field-label{
+    font-size:12px;
+    font-weight:bold;
+    color:#002B5C;
+    margin-bottom:6px;
+}
+
+.field-player{
+    font-size:14px;
+    font-weight:bold;
+    word-break:break-word;
+}
+
+.keeper-row{
+    display:flex;
+    justify-content:center;
+}
+
+.keeper-position{
+    width:140px;
+    background:#e3f2fd;
+    border:2px solid #90caf9;
+}
+
+#benchPlayers{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:10px;
+}
 .player-line{
     display:flex;
     justify-content:space-between;
@@ -127,7 +180,7 @@ select{
 
 .score-row{
     display:grid;
-    grid-template-columns:120px 60px 80px;
+    grid-template-columns:160px 60px 80px;
     justify-content:center;
     align-items:center;
     gap:12px;
@@ -135,7 +188,7 @@ select{
 
 #homeTeamLabel,
 #awayTeamLabel{
-    font-size:18px;
+    font-size:24px;
     font-weight:bold;
     color:#002B5C;
     text-align:center;
@@ -171,23 +224,6 @@ select{
     padding:10px;
 }
 
-.dual-card{
-    display:flex;
-    gap:15px;
-    flex-wrap:wrap;
-}
-
-.dual-card-section{
-    flex:1;
-    min-width:180px;
-}
-
-.dual-card-section:first-child{
-    border-right:1px solid #e0e0e0;
-    padding-right:15px;
-}
-
-#keeperPlanning,
 #switchCompass{
     font-size:14px;
     line-height:1.5;
@@ -263,7 +299,31 @@ select{
 
 </div>
 
-<!-- VOORBEREIDING -->
+<!-- ===================================================== -->
+<!-- VOORBEREIDINGSSCHERM -->
+<!-- Teambeheer / Selectie / Opstelling -->
+<!-- ===================================================== -->
+
+
+<div id="archiveScreen" class="container hidden">
+
+    <div class="card">
+
+        <h2>📁 Wedstrijdarchief</h2>
+
+        <div id="archiveList">
+            Nog geen wedstrijden opgeslagen
+        </div>
+
+        <button
+        onclick="closeArchive()"
+        style="margin-top:15px;">
+            Sluiten
+        </button>
+
+    </div>
+
+</div>
 
 <div id="prepScreen" class="container">
 
@@ -297,6 +357,12 @@ onchange="loadSelectedTeam()">
     <button onclick="saveTeam()">
         Team opslaan
     </button>
+
+<button
+onclick="showArchive()"
+style="background:#1565c0;margin-top:8px;">
+📁 Wedstrijdarchief
+</button>
 
 <button
 onclick="deleteTeam()"
@@ -434,7 +500,10 @@ style="background:#c62828; margin-bottom:10px;">
 
 </div>
 
-<!-- WEDSTRIJD -->
+<!-- ===================================================== -->
+<!-- WEDSTRIJDSCHERM -->
+<!-- Timer / Score / Wissels / Rapportage -->
+<!-- ===================================================== -->
 
 <div id="matchScreen"
 class="container hidden">
@@ -591,81 +660,75 @@ onclick="undoAwayGoal()">
 
 <div class="card">
 
-<h2>Huidige veldopstelling</h2>
+    <h2>Huidige veldopstelling</h2>
 
-<div class="field">
+    <div class="field-layout">
 
-    <div class="row">
+        <div class="field-row">
 
-        <div>
-            <strong>Keeper</strong><br>
-            <span id="mKeeper"></span>
+            <div class="field-position">
+                <div class="field-label">LH</div>
+                <div id="mLH" class="field-player"></div>
+            </div>
+
+            <div class="field-position">
+                <div class="field-label">LO</div>
+                <div id="mLO" class="field-player"></div>
+            </div>
+
+            <div class="field-position">
+                <div class="field-label">CIR</div>
+                <div id="mPivot" class="field-player"></div>
+            </div>
+
+            <div class="field-position">
+                <div class="field-label">RO</div>
+                <div id="mRO" class="field-player"></div>
+            </div>
+
+            <div class="field-position">
+                <div class="field-label">RH</div>
+                <div id="mRH" class="field-player"></div>
+            </div>
+
         </div>
 
-        <div>
-            <strong>Cirkellijn</strong><br>
-            <span id="mPivot"></span>
-        </div>
+        <div class="keeper-row">
 
-    </div>
+            <div class="field-position keeper-position">
+                <div class="field-label">KEEPER</div>
+                <div id="mKeeper" class="field-player"></div>
+            </div>
 
-    <br>
-
-    <div class="row">
-
-        <div>
-            <strong>Linkeropbouw</strong><br>
-            <span id="mLO"></span>
-        </div>
-
-        <div>
-            <strong>Rechteropbouw</strong><br>
-            <span id="mRO"></span>
-        </div>
-
-    </div>
-
-    <br>
-
-    <div class="row">
-
-        <div>
-            <strong>Linkerhoek</strong><br>
-            <span id="mLH"></span>
-        </div>
-
-        <div>
-            <strong>Rechterhoek</strong><br>
-            <span id="mRH"></span>
         </div>
 
     </div>
 
-</div>
+    <hr style="margin:20px 0;">
 
-<br>
+    <div>
 
-<hr style="margin:15px 0;">
+        <strong>Reservespelers</strong>
 
-<div>
+        <div
+        id="benchPlayers"
+        style="margin-top:10px;">
+        </div>
 
-    <strong>Reservespelers</strong>
-
-    <div
-    id="benchPlayers"
-    style="
-        margin-top:10px;
-    ">
     </div>
 
-</div>
+    <button
+    onclick="showHalftimeSetup()"
+    style="margin-top:15px;">
+        ⚙️ Opstelling aanpassen
+    </button>
 
 </div>
 
 <div id="halftimeSetupCard"
 class="card hidden">
 
-<h2>⚙️ Tweede helft opstelling</h2>
+<h2>⚙️ Opstelling aanpassen</h2>
 
 <div class="position">
 Keeper
@@ -717,7 +780,7 @@ Nog geen advies
 
 <hr style="margin:15px 0;">
 
-<h3>Handmatige wissel</h3>
+<h3>Snelle wissel</h3>
 
 <div>
 
@@ -756,25 +819,24 @@ Wissel uitvoeren
 
 <div class="card">
 
-<div style="
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin-bottom:10px;
-">
+<div style="margin-bottom:10px;">
+
+    <h2 style="margin:0;">
+        Speeltijden
+    </h2>
 
     <div
-id="fairPlayStatus"
-style="
-background:#eef7ee;
-padding:8px;
-border-radius:8px;
-font-weight:bold;
-text-align:center;
-margin-top:8px;
-">
-🟢 Teams zijn in balans
-</div>
+    id="fairPlayStatus"
+    style="
+    background:#eef7ee;
+    padding:8px;
+    border-radius:8px;
+    font-weight:bold;
+    text-align:center;
+    margin-top:8px;
+    ">
+        🟢 Team is in balans
+    </div>
 
 </div>
 
@@ -788,31 +850,14 @@ Nog geen speeltijden
 
 <div class="card">
 
-    <div class="dual-card">
+    <h2>🏐 Wisselkompas</h2>
 
-        <div class="dual-card-section">
-
-            <h2>🥅 Keeperplanning</h2>
-
-            <div id="keeperPlanning">
-                Nog niet berekend
-            </div>
-
-        </div>
-
-        <div class="dual-card-section">
-
-            <h2>🏐 Wisselkompas</h2>
-
-            <div id="switchCompass">
-                Nog niet beschikbaar
-            </div>
-
-        </div>
-
+    <div id="switchCompass">
+        Nog niet beschikbaar
     </div>
 
 </div>
+
 <div class="card">
 
 <h2>Wisselhistorie</h2>
@@ -825,17 +870,64 @@ Nog geen wissels
 
 </div>
 
+<button
+id="downloadReportBtn"
+onclick="downloadMatchReport()"
+class="hidden"
+style="margin-bottom:10px;">
+📄 Wedstrijdrapport downloaden
+</button>
+
 <button onclick="backToSetup()">
     ⚙️ Wedstrijdinstellingen
 </button>
 
 <div class="watermark">
-    Handbal WisselCoach v1.0 • © 2026 Niels te Heemskerk
+    Handbal WisselCoach v1.1 • © 2026 Niels te Heemskerk
+</div>
+
+</div>
+
+<div
+id="archiveDetailModal"
+class="hidden"
+style="
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.6);
+overflow:auto;
+z-index:9999;
+">
+
+<div
+style="
+background:white;
+margin:20px auto;
+padding:20px;
+max-width:700px;
+border-radius:10px;
+">
+
+<div id="archiveDetailContent"></div>
+
+<button
+onclick="closeArchiveDetails()"
+style="margin-top:15px;">
+Sluiten
+</button>
+
 </div>
 
 </div>
 
 <script>
+
+/* ===================================================== */
+/* GLOBALE VARIABELEN */
+/* ===================================================== */
 
 let players=[];
 
@@ -851,9 +943,17 @@ let timerInterval = null;
 let benchCount = {};
 let playTimes = {};
 let keeperTime = {};
+let positionTimes = {};
 let currentLineup = {};
 let substitutionLog = [];
 let playerAvailable = {};
+
+let matchArchive = [];
+let matchArchived = false;
+
+/* ===================================================== */
+/* TEAMBEHEER */
+/* ===================================================== */
 
 function addPlayer(){
 
@@ -985,14 +1085,13 @@ playerAvailable = {};
 playTimes = {};
 benchCount = {};
 keeperTime = {};
+positionTimes = {};
 substitutionLog = [];
 currentLineup = {};
 
 renderPlayers();
 
 renderSwitchCompass();
-
-buildKeeperPlanning();
 
 renderPositionLists();
 
@@ -1014,6 +1113,10 @@ document
 .classList.add("hidden");
 
 }
+
+/* ===================================================== */
+/* WEERGAVE & RENDERING */
+/* ===================================================== */
 
 function renderPlayers(){
 
@@ -1048,8 +1151,8 @@ function renderAttendance(){
             = this.checked;
             renderPositionLists();
             renderSwitchCompass();
-   	    buildKeeperPlanning();
-            ">
+   	    "
+	    >
 
             ${player}
 
@@ -1110,7 +1213,7 @@ ${playerKeepers[player] ? "checked" : ""}
 onchange="
 playerKeepers['${player}']=this.checked;
 renderPositionLists();
-buildKeeperPlanning();
+
 ">
 
 Keeper
@@ -1139,6 +1242,7 @@ delete playerAvailable[removedPlayer];
 delete playTimes[removedPlayer];
 delete benchCount[removedPlayer];
 delete keeperTime[removedPlayer];
+delete positionTimes[removedPlayer];
 
     players.splice(index,1);
 
@@ -1261,6 +1365,10 @@ document
 
 }
 
+/* ===================================================== */
+/* WEDSTRIJDSTART */
+/* ===================================================== */
+
 function newMatch(){
 
     if(
@@ -1274,49 +1382,51 @@ function newMatch(){
     homeScore = 0;
     awayScore = 0;
 
-    matchSeconds = 0;
+matchSeconds = 0;
+matchArchived = false;
 
-    pauseTimer();
+localStorage.removeItem(
+    "activeMatch"
+);
 
-    playTimes = {};
-    benchCount = {};
-    keeperTime = {};
-    substitutionLog = [];
-    currentLineup = {};
+pauseTimer();
 
-    document.getElementById("homeScore").innerText = "0";
-    document.getElementById("awayScore").innerText = "0";
+playTimes = {};
+benchCount = {};
+keeperTime = {};
+substitutionLog = [];
+currentLineup = {};
+positionTimes = {};
 
-    document.getElementById("timer").innerText = "00:00";
+document.getElementById("homeScore").innerText = "0";
+document.getElementById("awayScore").innerText = "0";
 
-    document.getElementById("matchPhase").innerText =
-    "1e Helft";
+document.getElementById("timer").innerText = "00:00";
 
-    document.getElementById("substitutionHistory").innerHTML =
-    "Nog geen wissels";
+document.getElementById("matchPhase").innerText =
+	"1e Helft";
 
-    document.getElementById("subAdvice").innerHTML =
-    "Nog geen advies";
+document.getElementById("substitutionHistory").innerHTML =
+	"Nog geen wissels";
 
-    document.getElementById("playTimesView").innerHTML =
-    "Nog geen speeltijden";
+document.getElementById("subAdvice").innerHTML =
+    	"Nog geen advies";
 
-    alert("Nieuwe wedstrijd gestart");
+document.getElementById("playTimesView").innerHTML =
+    	"Nog geen speeltijden";
+
+    	alert("Nieuwe wedstrijd gestart");
 }
 
 function startMatch(){
 
 if(Object.keys(currentLineup).length > 0){
 
-    document
-    .getElementById("prepScreen")
-    .classList.add("hidden");
+document.getElementById("prepScreen").classList.add("hidden");
 
-    document
-    .getElementById("matchScreen")
-    .classList.remove("hidden");
+document.getElementById("matchScreen").classList.remove("hidden");
 
-    return;
+    	return;
 }
 
 homeScore = 0;
@@ -1335,22 +1445,20 @@ document.getElementById("alertBanner").style.display = "none";
 
 matchSeconds = 0;
 
+matchArchived = false;
+
 pauseTimer();
 
-const existingButton =
-document.getElementById("downloadReportBtn");
-
-if(existingButton){
-
-    existingButton.remove();
-
-}
+document
+.getElementById("downloadReportBtn")
+.classList.add("hidden");
 
 playTimes = {};
 benchCount = {};
 substitutionLog = [];
 currentLineup = {};
 keeperTime = {};
+positionTimes = {};
 
 document
 .getElementById("timer")
@@ -1403,14 +1511,25 @@ if(availablePlayers.length < 6){
         return;
     }
 
-    availablePlayers.forEach(player => {
+availablePlayers.forEach(player => {
 
-        playTimes[player] = 0;
+    playTimes[player] = 0;
 
-        benchCount[player] =
-        starters.includes(player) ? 0 : 1;
+    positionTimes[player] = {
 
-    });
+        keeper:0,
+        pivot:0,
+        leftBack:0,
+        rightBack:0,
+        leftCorner:0,
+        rightCorner:0
+
+    };
+
+    benchCount[player] =
+    starters.includes(player) ? 0 : 1;
+
+});
 
     const homeTeam =
 
@@ -1470,7 +1589,6 @@ if(availablePlayers.length < 6){
     };
 
     renderPlayingTimes();
-    buildKeeperPlanning();
     renderSwitchCompass();
     renderSubstitutionOptions();
     renderSubstitutionHistory();
@@ -1503,6 +1621,10 @@ ${player}
 
 }
 
+/* ===================================================== */
+/* SCORE & TIMER */
+/* ===================================================== */
+
 function goalHome(){
 
     homeScore++;
@@ -1511,6 +1633,8 @@ function goalHome(){
     .getElementById("homeScore")
     .innerText =
     homeScore;
+
+    saveMatchState();
 }
 
 function goalAway(){
@@ -1521,6 +1645,8 @@ function goalAway(){
     .getElementById("awayScore")
     .innerText =
     awayScore;
+
+    saveMatchState();
 }
 
 function undoHomeGoal(){
@@ -1533,6 +1659,8 @@ function undoHomeGoal(){
         .getElementById("homeScore")
         .innerText =
         homeScore;
+
+        saveMatchState();
     }
 }
 
@@ -1546,6 +1674,8 @@ function undoAwayGoal(){
         .getElementById("awayScore")
         .innerText =
         awayScore;
+
+        saveMatchState();
     }
 }
 
@@ -1624,15 +1754,23 @@ playerKeepers[player]
 ? " (KP)"
 : "";
 
+const position =
+Object.keys(currentLineup)
+.find(pos => currentLineup[pos] === player);
+
+const status =
+position
+? " • VELD (" + getPositionLabel(position) + ")"
+: " • BANK";
+
 html += `
 <option
 value="${player}"
 ${player===currentPlayer ? "selected" : ""}
 >
-${player}${keeperTag}
+${player}${keeperTag}${status}
 </option>
 `;
-
         });
 
         document.getElementById(id)
@@ -1725,12 +1863,12 @@ Object.keys(lineup).forEach(position => {
 });
 
 currentLineup = lineup;
-
 updateFieldDisplay();
-
 renderSubstitutionOptions();
-
 renderSubstitutionHistory();
+calculateSubAdvice();
+updateFairPlay();
+saveMatchState();
 
     document
     .getElementById("halftimeSetupCard")
@@ -1844,29 +1982,36 @@ document.getElementById(
 "🏁 Wedstrijd afgelopen\n\nDownload het wedstrijdrapport."
 );
 
-if(!document.getElementById("downloadReportBtn")){
+if(!matchArchived){
 
-    const btn =
-    document.createElement("button");
+    saveMatchToArchive();
 
-    btn.id = "downloadReportBtn";
+    localStorage.removeItem(
+        "activeMatch"
+    );
 
-    btn.innerText =
-    "📄 Wedstrijdrapport downloaden";
+    matchArchived = true;
 
-    btn.style.marginTop = "10px";
+}
 
-    btn.onclick =
-    downloadMatchReport;
+document
+.getElementById("downloadReportBtn")
+.classList.remove("hidden");
 
-    document
-    .getElementById("matchScreen")
-    .appendChild(btn);
+}
+
+if(matchSeconds % 60 === 0 &&
+   matchSeconds < 2400){
+
+    saveMatchState();
+
 }
 
 }
 
-}
+/* ===================================================== */
+/* SPEELTIJDEN & ADVIEZEN */
+/* ===================================================== */
 
 function updatePlayingTimes(){
 
@@ -1889,6 +2034,29 @@ function updatePlayingTimes(){
 
     }
 
+Object.entries(currentLineup)
+.forEach(([position,player]) => {
+
+    if(player){
+
+        if(!positionTimes[player]){
+    positionTimes[player] = {
+        keeper:0,
+        pivot:0,
+        leftBack:0,
+        rightBack:0,
+        leftCorner:0,
+        rightCorner:0
+    };
+}
+
+positionTimes[player][position]++;
+
+
+    }
+
+});
+
     renderPlayingTimes();
     calculateSubAdvice();
     updateFairPlay();
@@ -1902,7 +2070,7 @@ function renderPlayingTimes(){
 html += `
 <div style="
 display:grid;
-grid-template-columns:150px 70px 80px;
+grid-template-columns:120px 60px 1fr;
 gap:10px;
 font-weight:bold;
 border-bottom:1px solid #ddd;
@@ -1910,9 +2078,10 @@ padding-bottom:4px;
 margin-bottom:6px;
 color:#002B5C;
 ">
-    <span>Speelster</span>
-    <span>Tijd</span>
-    <span>Bank</span>
+<span>Speelster</span>
+<span>Tijd</span>
+<span>Posities</span>
+
 </div>
 `;
 
@@ -1947,63 +2116,88 @@ Math.max(...values, 0);
             color = "#ff9800";
         }
 
-        html += `
+const labels = {
+    keeper:"KP",
+    pivot:"CIR",
+    leftBack:"LO",
+    rightBack:"RO",
+    leftCorner:"LH",
+    rightCorner:"RH"
+};
+
+const currentPosition =
+Object.keys(currentLineup)
+.find(
+    pos => currentLineup[pos] === player
+);
+
+let currentPositionText = "";
+let previousPositions = [];
+
+Object.entries(positionTimes[player] || {})
+.forEach(([position,time]) => {
+
+    if(time <= 0){
+        return;
+    }
+
+    if(position === currentPosition){
+
+        currentPositionText =
+        labels[position] +
+        " (" +
+        Math.floor(time / 60) +
+        "m)";
+
+    } else {
+
+        previousPositions.push(
+            labels[position]
+        );
+
+    }
+
+});
+
+html += `
 
 <div
 style="
 display:grid;
-grid-template-columns:120px 80px 80px;
+grid-template-columns:120px 60px 1fr;
 gap:10px;
 color:${color};
 font-weight:bold;
-margin-bottom:4px;
+margin-bottom:6px;
 ">
 
     <span>${player}</span>
 
-    <span>${minutes} min</span>
+    <span>${minutes}m</span>
 
-    <span>Bank: ${benchCount[player] || 0}x</span>
+    <span style="font-weight:normal;">
+        ${currentPositionText}
+
+        <span style="
+            font-size:11px;
+            color:#888;
+        ">
+            ${
+                previousPositions.length
+                ? " · " + previousPositions.join(" · ")
+                : ""
+            }
+        </span>
+    </span>
 
 </div>
 
 `;
-
     });
 
     document
     .getElementById("playTimesView")
     .innerHTML = html;
-}
-
-function buildKeeperPlanning(){
-
-const keepers =
-players.filter(
-    player =>
-    playerKeepers[player] &&
-    playerAvailable[player]
-);
-
-if(keepers.length !== 4){
-
-    document
-    .getElementById("keeperPlanning")
-    .innerHTML =
-    "Selecteer exact 4 keepers";
-
-    return;
-}
-    document
-    .getElementById("keeperPlanning")
-    .innerHTML =
-
-    `
-    <div>0 - 10 min: ${keepers[0]}</div>
-    <div>10 - 20 min: ${keepers[1]}</div>
-    <div>20 - 30 min: ${keepers[2]}</div>
-    <div>30 - 40 min: ${keepers[3]}</div>
-    `;
 }
 
 function renderSwitchCompass(){
@@ -2063,36 +2257,43 @@ function renderSwitchCompass(){
 
 function renderSubstitutionOptions(){
 
-    const fieldPlayers =
-    Object.values(currentLineup);
-
-    const benchPlayers =
-    players.filter(
-    player =>
+const availablePlayers =
+players.filter(
+player =>
     playerAvailable[player] &&
-    !fieldPlayers.includes(player)
+    !Object.values(currentLineup).includes(player)
 );
 
-    let html = "";
+if(availablePlayers.length === 0){
 
-    benchPlayers.forEach(player => {
+    document.getElementById("subIn").innerHTML =
+    "<option>Geen bankspelers beschikbaar</option>";
+
+    return;
+}
+
+let html = "";
+
+availablePlayers.forEach(player => {
 
     const hand =
 playerHandedness[player] === "left"
 ? "LH"
 : "RH";
 
-const keeperTag =
-playerKeepers[player]
-? " • KP"
-: "";
+const profile = [];
+
+profile.push(hand);
+
+if(playerKeepers[player]){
+    profile.push("KP");
+}
 
 html += `
 <option value="${player}">
-    ${player} (${hand}${keeperTag})
+    ${player} (${profile.join(", ")})
 </option>
 `;
-
 });
 
     document
@@ -2143,6 +2344,10 @@ function renderSubstitutionHistory(){
     ).join("");
 }
 
+/* ===================================================== */
+/* HULPFUNCTIES */
+/* ===================================================== */
+
 function getPositionLabel(position){
 
     const labels = {
@@ -2158,6 +2363,10 @@ function getPositionLabel(position){
 
     return labels[position] || position;
 }
+
+/* ===================================================== */
+/* OPSTELLING & WISSELS */
+/* ===================================================== */
 
 function makeSubstitution(){
 
@@ -2175,14 +2384,33 @@ function makeSubstitution(){
         return;
     }
 
-    const outgoing =
-    currentLineup[position];
+const outgoing =
+currentLineup[position];
 
-    currentLineup[position] =
-    incoming;
+// staat deze speelster al ergens op het veld?
+const previousPosition =
+Object.keys(currentLineup).find(
+    pos => currentLineup[pos] === incoming
+);
+
+if(previousPosition){
+
+    alert(
+        incoming +
+        " staat al in het veld."
+    );
+
+    return;
+}
+
+currentLineup[position] = incoming;
+
+if(outgoing){
 
     benchCount[outgoing] =
     (benchCount[outgoing] || 0) + 1;
+
+}
 
     updateFieldDisplay();
 
@@ -2206,66 +2434,70 @@ substitutionLog.unshift({
 
 renderSubstitutionHistory();
 calculateSubAdvice();
+saveMatchState();
 
 }
 
 function updateFieldDisplay(){
 
-    document
-    .getElementById("mKeeper")
-    .innerText =
-    currentLineup.keeper;
+    document.getElementById("mKeeper").innerText =
+    currentLineup.keeper || "⚠️ Open";
 
-    document
-    .getElementById("mPivot")
-    .innerText =
-    currentLineup.pivot;
+    document.getElementById("mPivot").innerText =
+    currentLineup.pivot || "⚠️ Open";
 
-    document
-    .getElementById("mLO")
-    .innerText =
-    currentLineup.leftBack;
+    document.getElementById("mLO").innerText =
+    currentLineup.leftBack || "⚠️ Open";
 
-    document
-    .getElementById("mRO")
-    .innerText =
-    currentLineup.rightBack;
+    document.getElementById("mRO").innerText =
+    currentLineup.rightBack || "⚠️ Open";
 
-    document
-    .getElementById("mLH")
-    .innerText =
-    currentLineup.leftCorner;
+    document.getElementById("mLH").innerText =
+    currentLineup.leftCorner || "⚠️ Open";
 
-    document
-    .getElementById("mRH")
-    .innerText =
-    currentLineup.rightCorner;
+    document.getElementById("mRH").innerText =
+    currentLineup.rightCorner || "⚠️ Open";
 
     const fieldPlayers =
     Object.values(currentLineup);
 
     const benchPlayers =
     players.filter(
-    player =>
-    playerAvailable[player] &&
-    !fieldPlayers.includes(player)
-);
+        player =>
+        playerAvailable[player] &&
+        !fieldPlayers.includes(player)
+    );
 
-document
-.getElementById("benchPlayers")
-.innerHTML =
+    document
+    .getElementById("benchPlayers")
+    .innerHTML =
 
-benchPlayers.length
+    benchPlayers.length
 
-? benchPlayers.map(player =>
+    ? benchPlayers.map(player =>
 
-`<span class="bench-chip">
-${player}
-</span>`
+        `<span class="bench-chip">
+        ${player}
+        </span>`
 
-).join("")
+      ).join("")
 
-: "Geen bankspelers";
+    : "Geen bankspelers";
+
+    const activeCount =
+    Object.values(currentLineup)
+    .filter(Boolean)
+    .length;
+
+    if(activeCount < 6){
+
+        showAlertBanner(
+            "⚠️ Opstelling onvolledig (" +
+            activeCount +
+            "/6)"
+        );
+
+    }
 
 }
 
@@ -2281,125 +2513,144 @@ function calculateSubAdvice(){
         return;
     }
 
+const availableCount =
+players.filter(
+    player => playerAvailable[player]
+).length;
+
+let adviceCount = 1;
+
+if(availableCount === 10){
+    adviceCount = 2;
+}
+else if(availableCount === 9){
+    adviceCount = 3;
+}
+else if(availableCount === 8){
+    adviceCount = 2;
+}
+
+    const activePlayers =
+    Object.values(currentLineup)
+    .filter(Boolean);
+
     const fieldPlayers =
-    Object.values(currentLineup);
+    activePlayers.filter(
+        player => player !== currentLineup.keeper
+    );
 
     const benchPlayers =
     players.filter(
-    player =>
-    playerAvailable[player] &&
-    !fieldPlayers.includes(player)
-);
-
-    if(
-    fieldPlayers.length === 0 ||
-    benchPlayers.length === 0
-){
-
-    document.getElementById(
-        "subAdvice"
-    ).innerHTML =
-    "Geen wissel mogelijk";
-
-    return;
-}
-
-const longestPlaying =
-fieldPlayers.reduce(
-    (a,b) =>
-    getTotalPlayTime(a) >
-    getTotalPlayTime(b)
-    ? a
-    : b
-);
-
-    const positionOfLongest = Object.keys(currentLineup)
-    .find(
-        position =>
-        currentLineup[position] === longestPlaying
+        player =>
+            playerAvailable[player] &&
+            !activePlayers.includes(player)
     );
 
-const suitableBenchPlayers =
-benchPlayers;
+    if(fieldPlayers.length === 0){
 
-if(suitableBenchPlayers.length === 0){
+        document
+        .getElementById("subAdvice")
+        .innerHTML =
+        "Geen veldspeelsters beschikbaar";
 
-    document
-    .getElementById("subAdvice")
-    .innerHTML =
+        return;
+    }
 
-    "Geen passende wissel beschikbaar";
+    if(benchPlayers.length === 0){
 
-    return;
-}
+        document
+        .getElementById("subAdvice")
+        .innerHTML =
+        "Geen bankspelers beschikbaar voor wisseladvies";
 
-const shortestPlaying =
-suitableBenchPlayers.reduce(
+        return;
+    }
+
+const sortedFieldPlayers =
+fieldPlayers
+.slice()
+.sort(
     (a,b) =>
-    getTotalPlayTime(a) <
+    getTotalPlayTime(b) -
+    getTotalPlayTime(a)
+);
+
+const sortedBenchPlayers =
+benchPlayers
+.slice()
+.sort(
+    (a,b) =>
+    getTotalPlayTime(a) -
     getTotalPlayTime(b)
-    ? a
-    : b
 );
 
-const diff =
-Math.floor(
-(
-    getTotalPlayTime(longestPlaying)
-    -
-    getTotalPlayTime(shortestPlaying)
-) / 60
-);
-
-document
-.getElementById("subAdvice")
-.innerHTML =
-
-`
-<div
-style="
-display:flex;
-justify-content:space-between;
-align-items:center;
-gap:12px;
-"
->
-
-    <div>
-
-        <strong>
-        🎯 ${getPositionLabel(positionOfLongest)}
-        </strong>
-
-        <br>
-
-        ${shortestPlaying}
-        ⇄
-        ${longestPlaying}
-
-        <span style="color:#666;">
-        (+${diff} min)
-        </span>
-
-    </div>
-
-    <button
-    style="
-    width:auto;
-    padding:8px 14px;
-    min-width:60px;
-    "
-    onclick="
-    document.getElementById('subIn').value='${shortestPlaying}';
-    document.getElementById('subPosition').value='${positionOfLongest}';
-    makeSubstitution();
-    ">
-        ✓
-    </button>
-
-</div>
+let adviceHtml = `
+<b>🎯 Geadviseerde wissels</b>
+<br><br>
 `;
 
+for(
+    let i = 0;
+    i < Math.min(
+        adviceCount,
+        sortedFieldPlayers.length,
+        sortedBenchPlayers.length
+    );
+    i++
+){
+
+    const outgoing =
+    sortedFieldPlayers[i];
+
+    const incoming =
+    sortedBenchPlayers[i];
+
+    const position =
+    Object.keys(currentLineup)
+    .find(
+        pos =>
+        currentLineup[pos] === outgoing
+    );
+
+    adviceHtml += `
+    <div style="
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        margin-bottom:10px;
+        padding:8px;
+        background:#f7f9fc;
+        border-radius:8px;
+    ">
+
+        <div>
+            ${incoming}
+            → voor
+            ${outgoing}
+            (${getPositionLabel(position)})
+        </div>
+
+        <button
+        style="
+            width:auto;
+            min-width:50px;
+            padding:6px 10px;
+        "
+        onclick="
+            document.getElementById('subIn').value='${incoming}';
+            document.getElementById('subPosition').value='${position}';
+            makeSubstitution();
+        ">
+            ✓
+        </button>
+
+    </div>
+    `;
+}
+
+document
+.getElementById("subAdvice").innerHTML =
+adviceHtml;
 }
 
 function updateFairPlay(){
@@ -2453,7 +2704,7 @@ players
 
         status.innerHTML =
 
-        "🟢 Teams zijn in balans";
+        "🟢 Speeltijden zijn in balans";
 
         status.style.color =
         "green";
@@ -2554,6 +2805,7 @@ function loadSelectedTeam(){
 playTimes = {};
 benchCount = {};
 keeperTime = {};
+positionTimes = {};
 substitutionLog = [];
 currentLineup = {};
 
@@ -2578,13 +2830,800 @@ document
 
     renderSwitchCompass();
 
-    buildKeeperPlanning();
-
 document
 .getElementById("teamManager")
 .classList.add("hidden");
 
 }
+
+function loadArchive(){
+
+    matchArchive =
+    JSON.parse(
+        localStorage.getItem("matchArchive")
+    ) || [];
+
+}
+
+function saveArchive(){
+
+    localStorage.setItem(
+        "matchArchive",
+        JSON.stringify(matchArchive)
+    );
+
+}
+
+function showArchive(){
+
+    renderArchive();
+
+    document
+    .getElementById("prepScreen")
+    .classList.add("hidden");
+
+    document
+    .getElementById("archiveScreen")
+    .classList.remove("hidden");
+
+}
+
+function closeArchive(){
+
+    document
+    .getElementById("archiveScreen")
+    .classList.add("hidden");
+
+    document
+    .getElementById("prepScreen")
+    .classList.remove("hidden");
+
+}
+
+function renderArchive(){
+
+    const container =
+    document.getElementById(
+        "archiveList"
+    );
+
+    if(matchArchive.length === 0){
+
+        container.innerHTML =
+        "Nog geen wedstrijden opgeslagen";
+
+        return;
+
+    }
+
+    container.innerHTML =
+
+    matchArchive.map(match =>
+
+    `
+    <div
+    style="
+    border:1px solid #ddd;
+    border-radius:8px;
+    padding:10px;
+    margin-bottom:10px;
+    ">
+
+        <strong>
+        ${match.homeTeam}
+        -
+        ${match.awayTeam}
+        </strong>
+
+        <br>
+
+        Datum:
+        ${match.date}
+
+        <br>
+
+        Eindstand:
+        ${match.homeScore}
+        -
+        ${match.awayScore}
+
+        <br><br>
+
+<button
+onclick="downloadArchivedMatch(${match.id})"
+style="background:#2e7d32;margin-bottom:8px;">
+    📄 Download rapport
+</button>
+
+<button
+onclick="viewArchivedMatch(${match.id})"
+style="
+background:#1565c0;
+margin-bottom:8px;
+">
+    👁 Details
+</button>
+
+<button
+onclick="deleteArchiveMatch(${match.id})"
+style="
+background:#c62828;
+">
+    Verwijderen
+</button>
+    </div>
+    `
+
+    ).join("");
+
+}
+
+function deleteArchiveMatch(id){
+
+    if(
+        !confirm(
+            "Wedstrijd verwijderen?"
+        )
+    ){
+        return;
+    }
+
+    matchArchive =
+    matchArchive.filter(
+        match => match.id !== id
+    );
+
+    saveArchive();
+
+    renderArchive();
+
+}
+
+function viewArchivedMatch(id){
+
+    const match =
+    matchArchive.find(
+        m => m.id === id
+    );
+
+    if(!match){
+        return;
+    }
+
+    let playTimesHtml = "";
+
+    Object.keys(match.playTimes || {})
+
+    .forEach(player => {
+
+        const minutes =
+        Math.floor(
+            match.playTimes[player] / 60
+        );
+
+        let positions = [];
+
+        const labels = {
+            keeper:"KP",
+            pivot:"CIR",
+            leftBack:"LO",
+            rightBack:"RO",
+            leftCorner:"LH",
+            rightCorner:"RH"
+        };
+
+const playerPositions =
+(match.positionTimes || {})[player] || {};
+
+        Object.entries(playerPositions)
+        .forEach(([position,time]) => {
+
+            if(time > 0){
+
+                positions.push(
+                    labels[position] +
+                    " (" +
+                    Math.floor(time/60) +
+                    "m)"
+                );
+
+            }
+
+        });
+
+        playTimesHtml += `
+        <tr>
+            <td>${player}</td>
+            <td>${minutes} min</td>
+            <td>${positions.join(", ")}</td>
+        </tr>
+        `;
+    });
+
+    let substitutionsHtml = "";
+
+    if(match.substitutions && match.substitutions.length){
+
+        substitutionsHtml =
+        match.substitutions
+        .slice()
+        .reverse()
+        .map(sub => `
+            <tr>
+                <td>${sub.minute}</td>
+                <td>${sub.position}</td>
+                <td>${sub.incoming}</td>
+                <td>${sub.outgoing}</td>
+            </tr>
+        `).join("");
+
+    } else {
+
+        substitutionsHtml =
+        `
+        <tr>
+            <td colspan="4">
+                Geen wissels
+            </td>
+        </tr>
+        `;
+    }
+
+   document.getElementById(
+    "archiveDetailContent"
+).innerHTML = `
+
+<style>
+
+#archiveDetailContent table{
+    width:100%;
+    border-collapse:collapse;
+    table-layout:fixed;
+}
+
+#archiveDetailContent th,
+#archiveDetailContent td{
+    border:1px solid #ddd;
+    padding:8px;
+    text-align:left;
+    vertical-align:top;
+}
+
+#archiveDetailContent th{
+    background:#eef2f7;
+}
+
+</style>
+
+<h2>
+${match.homeTeam}
+-
+${match.awayTeam}
+</h2>
+
+    <p>
+    <strong>Datum:</strong>
+    ${match.date}
+    </p>
+
+    <p>
+    <strong>Eindstand:</strong>
+    ${match.homeScore}
+    -
+    ${match.awayScore}
+    </p>
+
+    <h3>Speeltijden</h3>
+
+<table style="margin-bottom:20px;">
+
+<tr>
+    <th style="width:150px;">Speelster</th>
+    <th style="width:100px;">Tijd</th>
+    <th>Posities</th>
+</tr>
+
+${playTimesHtml}
+
+</table>
+
+    <h3>Wisselhistorie</h3>
+
+<table style="margin-bottom:20px;">
+
+<tr>
+    <th style="width:80px;">Moment</th>
+    <th style="width:180px;">Positie</th>
+    <th style="width:120px;">IN</th>
+    <th style="width:120px;">UIT</th>
+</tr>
+
+${substitutionsHtml}
+
+</table>
+
+    `;
+
+    document
+    .getElementById(
+        "archiveDetailModal"
+    )
+    .classList.remove("hidden");
+
+}
+
+function closeArchiveDetails(){
+
+    document
+    .getElementById(
+        "archiveDetailModal"
+    )
+    .classList.add("hidden");
+
+}
+
+function downloadArchivedMatch(id){
+
+    const match =
+    matchArchive.find(m => m.id === id);
+
+    if(!match){
+        return;
+    }
+
+    let playTimesHtml = "";
+
+    Object.keys(match.playTimes || {})
+    .forEach(player => {
+
+        const minutes =
+        Math.floor(
+            (match.playTimes[player] || 0) / 60
+        );
+
+        const labels = {
+            keeper:"KP",
+            pivot:"CIR",
+            leftBack:"LO",
+            rightBack:"RO",
+            leftCorner:"LH",
+            rightCorner:"RH"
+        };
+
+        const playerPositions =
+        (match.positionTimes || {})[player] || {};
+
+        let positions = [];
+
+        Object.entries(playerPositions)
+        .forEach(([position,time]) => {
+
+            if(time > 0){
+
+                positions.push(
+                    labels[position] +
+                    " (" +
+                    Math.floor(time/60) +
+                    "m)"
+                );
+
+            }
+
+        });
+
+        playTimesHtml += `
+        <tr>
+            <td>${player}</td>
+            <td>${minutes} min</td>
+            <td>${positions.join(", ")}</td>
+        </tr>
+        `;
+    });
+
+    let substitutionsHtml = "";
+
+    if(match.substitutions &&
+       match.substitutions.length){
+
+        substitutionsHtml =
+        match.substitutions
+        .slice()
+        .reverse()
+        .map(sub => `
+            <tr>
+                <td>${sub.minute}</td>
+                <td>${sub.position}</td>
+                <td>${sub.incoming}</td>
+                <td>${sub.outgoing}</td>
+            </tr>
+        `)
+        .join("");
+
+    } else {
+
+        substitutionsHtml = `
+        <tr>
+            <td colspan="4">
+                Geen wissels
+            </td>
+        </tr>
+        `;
+    }
+
+    const allTimes =
+    Object.values(match.playTimes || {});
+
+    const maxPlay =
+    allTimes.length
+    ? Math.max(...allTimes)
+    : 0;
+
+    const minPlay =
+    allTimes.length
+    ? Math.min(...allTimes)
+    : 0;
+
+    const fairPlayDiff =
+    Math.floor((maxPlay - minPlay) / 60);
+
+    let fairPlayLabel =
+    "🟢 Goed verdeeld";
+
+    if(fairPlayDiff >= 10){
+
+        fairPlayLabel =
+        "🔴 Groot verschil";
+
+    } else if(fairPlayDiff >= 5){
+
+        fairPlayLabel =
+        "🟠 Let op";
+    }
+
+    const report = `
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+
+<title>Wedstrijdrapport</title>
+
+<style>
+
+body{
+    font-family:Arial,sans-serif;
+    margin:30px;
+}
+
+h1,h2{
+    color:#002B5C;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-bottom:20px;
+}
+
+th,td{
+    border:1px solid #ccc;
+    padding:8px;
+    text-align:left;
+}
+
+th{
+    background:#eef2f7;
+}
+
+.result{
+    font-size:22px;
+    font-weight:bold;
+    margin-bottom:20px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>🏐 Wedstrijdrapport</h1>
+
+<p>
+<strong>Datum:</strong>
+${match.date}
+</p>
+
+<p>
+<strong>Wedstrijd:</strong>
+${match.homeTeam}
+-
+${match.awayTeam}
+</p>
+
+<div class="result">
+${match.homeTeam}
+${match.homeScore}
+-
+${match.awayScore}
+${match.awayTeam}
+</div>
+
+<h2>Speeltijden</h2>
+
+<table>
+
+<tr>
+    <th>Speelster</th>
+    <th>Speeltijd</th>
+    <th>Posities</th>
+</tr>
+
+${playTimesHtml}
+
+</table>
+
+<h2>Wisselhistorie</h2>
+
+<table>
+
+<tr>
+    <th>Moment</th>
+    <th>Positie</th>
+    <th>IN</th>
+    <th>UIT</th>
+</tr>
+
+${substitutionsHtml}
+
+</table>
+
+<h2>Fair Play Analyse</h2>
+
+<p>
+
+<strong>Status:</strong>
+${fairPlayLabel}
+
+<br><br>
+
+Max speeltijd:
+${Math.floor(maxPlay/60)} min
+
+<br>
+
+Min speeltijd:
+${Math.floor(minPlay/60)} min
+
+<br>
+
+Verschil:
+${fairPlayDiff} min
+
+</p>
+
+</body>
+</html>
+`;
+
+    const blob =
+    new Blob(
+        [report],
+        {type:"text/html"}
+    );
+
+    const url =
+    URL.createObjectURL(blob);
+
+    const a =
+    document.createElement("a");
+
+    a.href = url;
+
+const safeHome =
+match.homeTeam.replace(/[^\w\-]/g, "_");
+
+const safeAway =
+match.awayTeam.replace(/[^\w\-]/g, "_");
+
+a.download =
+`Wedstrijdrapport_${safeHome}_${safeAway}.html`;
+
+    document.body.appendChild(a);
+
+    a.click();
+
+    document.body.removeChild(a);
+
+    setTimeout(() => {
+        URL.revokeObjectURL(url);
+    }, 1000);
+
+}
+
+function saveMatchToArchive(){
+
+const match = {
+
+    id: Date.now(),
+
+    date:
+    new Date()
+    .toLocaleDateString("nl-NL"),
+
+    homeTeam:
+    document.getElementById(
+        "homeTeamLabel"
+    ).innerText,
+
+    awayTeam:
+    document.getElementById(
+        "awayTeamLabel"
+    ).innerText,
+
+    homeScore,
+
+    awayScore,
+
+    players:
+    JSON.parse(
+        JSON.stringify(players)
+    ),
+  
+  playerAvailable:
+  JSON.parse(
+         JSON.stringify(playerAvailable)
+    ),
+
+    playTimes:
+    JSON.parse(
+        JSON.stringify(playTimes)
+    ),
+
+    positionTimes:
+    JSON.parse(
+        JSON.stringify(positionTimes)
+    ),
+
+    substitutions:
+    JSON.parse(
+        JSON.stringify(substitutionLog)
+    )
+
+};
+
+    matchArchive.unshift(match);
+
+    saveArchive();
+
+}
+
+function saveMatchState(){
+
+    const state = {
+
+        matchSeconds,
+        homeScore,
+        awayScore,
+
+   players,
+   playerAvailable,
+   playerHandedness,
+   playerKeepers,
+
+        playTimes,
+        keeperTime,
+        positionTimes,
+
+        currentLineup,
+        substitutionLog,
+        benchCount,
+
+        homeTeam:
+            document.getElementById("homeTeamLabel").innerText,
+
+        awayTeam:
+            document.getElementById("awayTeamLabel").innerText,
+
+homeTeamInput:
+    document.getElementById("homeTeamName").value,
+
+awayTeamInput:
+    document.getElementById("awayTeamName").value
+
+    };
+
+    localStorage.setItem(
+        "activeMatch",
+        JSON.stringify(state)
+    );
+}
+
+function restoreMatchState(){
+
+    const saved =
+    localStorage.getItem("activeMatch");
+
+    if(!saved){
+        return;
+    }
+
+    const state =
+    JSON.parse(saved);
+
+    matchSeconds = state.matchSeconds || 0;
+    homeScore = state.homeScore || 0;
+    awayScore = state.awayScore || 0;
+
+document.getElementById("homeTeamLabel").innerText =
+    state.homeTeam || "Thuis";
+
+document.getElementById("awayTeamLabel").innerText =
+    state.awayTeam || "Uit";
+
+document.getElementById("homeTeamName").value =
+    state.homeTeamInput || "";
+
+document.getElementById("awayTeamName").value =
+    state.awayTeamInput || "";
+
+  players = state.players || [];
+  playerAvailable = state.playerAvailable || {};
+  playerHandedness = state.playerHandedness || {};
+  playerKeepers = state.playerKeepers || {};
+    playTimes = state.playTimes || {};
+    keeperTime = state.keeperTime || {};
+    positionTimes = state.positionTimes || {};
+    currentLineup = state.currentLineup || {};
+    substitutionLog = state.substitutionLog || [];
+    benchCount = state.benchCount || {};
+
+    if(
+        confirm(
+            "Herstel vorige wedstrijd?"
+        )
+    ){
+
+        document.getElementById("homeScore").innerText =
+        homeScore;
+
+        document.getElementById("awayScore").innerText =
+        awayScore;
+
+        document.getElementById("prepScreen")
+        .classList.add("hidden");
+
+        document.getElementById("matchScreen")
+        .classList.remove("hidden");
+
+renderPlayers();
+renderSwitchCompass();
+
+updateTimer();
+updateFieldDisplay();
+renderSubstitutionHistory();
+renderSubstitutionOptions();
+renderPlayingTimes();
+calculateSubAdvice();
+updateFairPlay();
+saveMatchState();
+
+}
+else{
+
+    localStorage.removeItem(
+        "activeMatch"
+    );
+
+  return;
+    
+}
+
+} 
+
+/* ===================================================== */
+/* RAPPORTAGE */
+/* ===================================================== */
 
 function downloadMatchReport(){
 
@@ -2606,19 +3645,42 @@ const minutes =
 Math.floor(
     getTotalPlayTime(player) / 60
 );
-const keeperMinutes =
-Math.floor(
-    getKeeperTime(player) / 60
-);
+let positions = [];
+
+const labels = {
+    keeper:"KP",
+    pivot:"CIR",
+    leftBack:"LO",
+    rightBack:"RO",
+    leftCorner:"LH",
+    rightCorner:"RH"
+};
+
+Object.entries(positionTimes[player] || {})
+.forEach(([position,time]) => {
+
+    if(time > 0){
+
+        positions.push(
+            labels[position] +
+            " (" +
+            Math.floor(time / 60) +
+            "m)"
+        );
+
+    }
+
+});
+
 playTimesHtml += `
 <tr>
     <td>${player}</td>
     <td>${minutes} min</td>
-    <td>${keeperMinutes} min</td>
-    <td>${benchCount[player] || 0}x</td>
+    <td>${positions.join(", ")}</td>
 </tr>
 `;
-    });
+
+});
 
     let substitutionsHtml = "";
 
@@ -2643,23 +3705,20 @@ playTimesHtml += `
         `<tr><td colspan="4">Geen wissels</td></tr>`;
     }
 
-    const keepers =
-    players.filter(
-        player =>
-        playerKeepers[player] &&
-        playerAvailable[player]
-    );
-
 const allTimes =
 players
 .filter(player => playerAvailable[player])
 .map(player => getTotalPlayTime(player));
 
 const maxPlay =
-Math.max(...allTimes);
+allTimes.length
+? Math.max(...allTimes)
+: 0;
 
 const minPlay =
-Math.min(...allTimes);
+allTimes.length
+? Math.min(...allTimes)
+: 0;
 
 const fairPlayDiff =
 Math.floor((maxPlay - minPlay) / 60);
@@ -2754,22 +3813,12 @@ ${players.filter(player => playerAvailable[player]).length}
 <tr>
     <th>Speelster</th>
     <th>Speeltijd</th>
-    <th>Keeptijd</th>
-    <th>Bank</th>
+    <th>Posities</th>
 </tr>
 
 ${playTimesHtml}
 
 </table>
-
-<h2>Keeperplanning</h2>
-
-<p>
-${keepers[0] ? `0-10 min: ${keepers[0]}<br>` : ""}
-${keepers[1] ? `10-20 min: ${keepers[1]}<br>` : ""}
-${keepers[2] ? `20-30 min: ${keepers[2]}<br>` : ""}
-${keepers[3] ? `30-40 min: ${keepers[3]}<br>` : ""}
-</p>
 
 <h2>Wisselhistorie</h2>
 
@@ -2846,17 +3895,17 @@ function showKeeperSwapCard(){
         return;
     }
 
-    const keepers =
-    players.filter(
-        player =>
-        playerKeepers[player] &&
-        playerAvailable[player]
-    );
+const keepers =
+players.filter(
+    player =>
+    playerKeepers[player] &&
+    playerAvailable[player]
+);
 
-    const availableKeepers =
-    keepers.filter(
-        player => player !== currentKeeper
-    );
+const availableKeepers =
+keepers.filter(
+    player => player !== currentKeeper
+);
 
     if(availableKeepers.length === 0){
 
@@ -2934,10 +3983,20 @@ function performKeeperSwap(){
         return;
     }
 
-    currentLineup.keeper =
-    newKeeper;
+const fieldPosition =
+Object.keys(currentLineup).find(
+    pos =>
+    pos !== "keeper" &&
+    currentLineup[pos] === newKeeper
+);
 
-    updateFieldDisplay();
+if(fieldPosition){
+    currentLineup[fieldPosition] = "";
+}
+
+currentLineup.keeper = newKeeper;
+
+updateFieldDisplay();
 
     substitutionLog.unshift({
 
@@ -2956,7 +4015,9 @@ function performKeeperSwap(){
 
     });
 
-    renderSubstitutionHistory();
+renderSubstitutionHistory();
+renderSubstitutionOptions();
+calculateSubAdvice();
 
     document
     .getElementById(
@@ -2976,6 +4037,8 @@ function performKeeperSwap(){
     " → " +
     newKeeper;
 
+    saveMatchState();
+
 }
 
 function backToSetup(){
@@ -2992,6 +4055,7 @@ document
 .getElementById("matchScreen")
 .classList.add("hidden");
 
+
 document
 .getElementById("prepScreen")
 .classList.remove("hidden");
@@ -3005,8 +4069,18 @@ function toggleCard(id){
 
 }
 
+/* ===================================================== */
+/* INITIALISATIE */
+/* ===================================================== */
+
 window.onload = function () {
+
     refreshTeamList();
+
+    loadArchive();
+
+   restoreMatchState();
+
 };
 
 if ("serviceWorker" in navigator) {

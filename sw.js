@@ -1,4 +1,4 @@
-const CACHE_NAME = "wisselcoach-v1-1";
+const CACHE_NAME = "wisselcoach-v1-2";
 
 self.addEventListener("install", event => {
     event.waitUntil(

@@ -1,3 +1,10 @@
+<!--
+Handbal WisselCoach v1.2
+© 2026 Niels te Heemskerk
+Alle rechten voorbehouden.
+Ongeoorloofde reproductie of verspreiding is verboden.
+-->
+
 <!DOCTYPE html>
 <html lang="nl">
 <head>
@@ -7,6 +14,10 @@
 <title>Handbal WisselCoach</title>
 
 <link rel="manifest" href="manifest.json">
+
+<!-- ===================================================== -->
+<!-- CSS OPMAAK -->
+<!-- ===================================================== -->
 
 <style>
 *{
@@ -23,9 +34,11 @@ body{
     background:#002B5C;
     color:white;
     padding:15px;
-    text-align:center;
     font-size:22px;
     font-weight:bold;
+
+    position:relative;
+    text-align:center;
 }
 
 .container{
@@ -40,6 +53,10 @@ body{
     border-radius:10px;
     padding:15px;
     box-shadow:0 2px 5px rgba(0,0,0,0.1);
+}
+
+.card h2{
+    margin:0 0 12px 0;
 }
 
 button{
@@ -279,6 +296,76 @@ select{
 .history-position{
     font-weight:500;
 }
+
+#infoButton{
+    position:absolute;
+    right:10px;
+    top:50%;
+    transform:translateY(-50%);
+
+    width:36px;
+    height:36px;
+
+    border-radius:50%;
+    border:none;
+
+    background:white;
+    color:#002B5C;
+
+    font-size:18px;
+    font-weight:bold;
+
+    padding:0;
+    cursor:pointer;
+}
+
+body{
+    font-family:Arial,sans-serif;
+    margin:0;
+    background:#f4f5f7;
+    position:relative;
+}
+
+#infoModal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.6);
+    display:none;
+    z-index:10000;
+    padding:15px;
+}
+
+#infoContent{
+    background:white;
+    border-radius:16px;
+    padding:20px;
+    max-width:600px;
+    margin:auto;
+    max-height:90vh;
+    overflow-y:auto;
+    font-size:15px;
+    line-height:1.5;
+}
+
+#infoContent h2{
+    color:#002B5C;
+    margin-top:0;
+}
+
+#infoContent h3{
+    color:#1565c0;
+    margin-top:20px;
+}
+
+#infoContent ul{
+    padding-left:20px;
+}
+
+#infoCloseBtn{
+    margin-top:15px;
+    background:#1565c0;
+}
+
 </style>
 </head>
 
@@ -286,16 +373,11 @@ select{
 
 <div class="header">
 
-    Handbal WisselCoach
+    <span>Handbal WisselCoach</span>
 
-    <span
-    onclick="toggleTeamManager()"
-    style="
-        float:right;
-        cursor:pointer;
-    ">
-        ⚙️
-    </span>
+    <button id="infoButton" onclick="showInfoModal()">
+        ⓘ
+    </button>
 
 </div>
 
@@ -329,7 +411,7 @@ select{
 
 <div
 id="teamManager"
-class="card hidden">
+class="card">
 
     <h2>⚙️ Teambeheer</h2>
 
@@ -369,18 +451,6 @@ onclick="deleteTeam()"
 style="background:#c62828; margin-top:8px;">
     Team verwijderen
 </button>
-
-</div>
-
-<div class="card">
-
-<h2>🏐 Wedstrijdgegevens</h2>
-
-<label>Thuisteam</label>
-<input type="text" id="homeTeamName" placeholder="Bijv. DSS">
-
-<label>Uitteam</label>
-<input type="text" id="awayTeamName" placeholder="Bijv. KDO">
 
 </div>
 
@@ -454,37 +524,13 @@ Nog geen speelsters
 
 <div class="card">
 
-<h2>Startopstelling</h2>
+<h2>🏐 Wedstrijdgegevens</h2>
 
-<div class="position">
-Keeper
-<select id="keeper" onchange="renderPositionLists()"></select>
-</div>
+<label>Thuisteam</label>
+<input type="text" id="homeTeamName" placeholder="Bijv. DSS">
 
-<div class="position">
-Cirkellijn
-<select id="pivot" onchange="renderPositionLists()"></select>
-</div>
-
-<div class="position">
-Linkeropbouw
-<select id="leftBack" onchange="renderPositionLists()"></select>
-</div>
-
-<div class="position">
-Rechteropbouw
-<select id="rightBack" onchange="renderPositionLists()"></select>
-</div>
-
-<div class="position">
-Linkerhoek
-<select id="leftCorner" onchange="renderPositionLists()"></select>
-</div>
-
-<div class="position">
-Rechterhoek
-<select id="rightCorner" onchange="renderPositionLists()"></select>
-</div>
+<label>Uitteam</label>
+<input type="text" id="awayTeamName" placeholder="Bijv. KDO">
 
 </div>
 
@@ -718,51 +764,87 @@ onclick="undoAwayGoal()">
     </div>
 
     <button
-    onclick="showHalftimeSetup()"
+    onclick="showLineupSetup()"
     style="margin-top:15px;">
         ⚙️ Opstelling aanpassen
     </button>
 
 </div>
 
-<div id="halftimeSetupCard"
+<div id="lineupCard"
 class="card hidden">
 
-<h2>⚙️ Opstelling aanpassen</h2>
+<div style="
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:12px;
+">
+
+<h2 style="margin:0;">
+⚙️ Opstelling aanpassen
+</h2>
+
+<span
+onclick="closeLineupSetup()"
+style="
+cursor:pointer;
+font-size:24px;
+font-weight:bold;
+color:#666;
+">
+✖
+</span>
+
+</div>
 
 <div class="position">
 Keeper
-<select id="halfKeeper"></select>
+<select id="lineupKeeper"></select>
 </div>
 
 <div class="position">
 Cirkellijn
-<select id="halfPivot"></select>
+<select id="lineupPivot"></select>
 </div>
 
 <div class="position">
 Linkeropbouw
-<select id="halfLeftBack"></select>
+<select id="lineupLeftBack"></select>
 </div>
 
 <div class="position">
 Rechteropbouw
-<select id="halfRightBack"></select>
+<select id="lineupRightBack"></select>
 </div>
 
 <div class="position">
 Linkerhoek
-<select id="halfLeftCorner"></select>
+<select id="lineupLeftCorner"></select>
 </div>
 
 <div class="position">
 Rechterhoek
-<select id="halfRightCorner"></select>
+<select id="lineupRightCorner"></select>
 </div>
 
-<button onclick="applyHalftimeLineup()">
-Opstelling bevestigen
+<div style="display:flex;gap:10px;">
+
+<button
+onclick="applyLineup()"
+style="flex:1;">
+✅ Opslaan
 </button>
+
+<button
+onclick="closeLineupSetup()"
+style="
+flex:1;
+background:#757575;">
+❌ Annuleren
+</button>
+
+</div>
 
 </div>
 
@@ -770,7 +852,19 @@ Opstelling bevestigen
 
 <h2>🔄 Wisselcentrum</h2>
 
-<h3>Advies</h3>
+<div
+id="nextSwitchTimer"
+style="
+padding:10px;
+border-radius:8px;
+font-weight:bold;
+text-align:center;
+margin-bottom:12px;
+background:#e8f5e9;
+color:#2e7d32;
+">
+🟢 Volgend wisselmoment over 5:00
+</div>
 
 <div id="subAdvice">
 
@@ -781,16 +875,6 @@ Nog geen advies
 <hr style="margin:15px 0;">
 
 <h3>Snelle wissel</h3>
-
-<div>
-
-Speelster van bank
-
-<select id="subIn"></select>
-
-</div>
-
-<br>
 
 <div>
 
@@ -806,6 +890,16 @@ Positie
 <option value="rightCorner">Rechterhoek</option>
 
 </select>
+
+</div>
+
+<br>
+
+<div>
+
+Speelster van bank
+
+<select id="subIn"></select>
 
 </div>
 
@@ -850,7 +944,7 @@ Nog geen speeltijden
 
 <div class="card">
 
-    <h2>🏐 Wisselkompas</h2>
+    <h2>Wisselkompas</h2>
 
     <div id="switchCompass">
         Nog niet beschikbaar
@@ -879,11 +973,11 @@ style="margin-bottom:10px;">
 </button>
 
 <button onclick="backToSetup()">
-    ⚙️ Wedstrijdinstellingen
+    ⬅ Voorbereiding
 </button>
 
 <div class="watermark">
-    Handbal WisselCoach v1.1 • © 2026 Niels te Heemskerk
+    Handbal WisselCoach v1.2 • © 2026 Niels te Heemskerk
 </div>
 
 </div>
@@ -923,7 +1017,100 @@ Sluiten
 
 </div>
 
+<!-- ===================================================== -->
+<!-- JAVASCRIPT -->
+<!-- ===================================================== -->
+
+<div id="infoModal">
+
+    <div id="infoContent">
+
+        <h2>🏐 Welkom bij Handbal WisselCoach</h2>
+
+        <p>
+            Deze app helpt coaches om speeltijden eerlijk te verdelen,
+            wisselmomenten te organiseren en wedstrijden overzichtelijk
+            vast te leggen.
+        </p>
+
+        <h3>✅ Snelle start</h3>
+
+        <ul>
+            <li>Laad of maak een team</li>
+            <li>Controleer aanwezigheid</li>
+            <li>Leg per speelster kenmerken vast</li>
+            <li>Vul thuis- en uitteam in</li>
+            <li>Open de wedstrijd</li>
+            <li>Stel de beginopstelling vast</li>
+            <li>Start de timer</li>
+        </ul>
+
+        <h3>🔄 Wisseladviezen</h3>
+
+        <p>
+            De WisselCoach vergelijkt automatisch speeltijden en
+            adviseert welke speelsters kunnen wisselen zodat de
+            belasting zo eerlijk mogelijk verdeeld blijft.
+        </p>
+
+        <h3>⚖️ Fair Play</h3>
+
+        <ul>
+            <li>🟢 0-2 minuten verschil</li>
+            <li>🟠 3-4 minuten verschil</li>
+            <li>🔴 5+ minuten verschil</li>
+        </ul>
+
+        <h3>🥅 Keeperwissels</h3>
+
+        <p>
+            Rond 10:00, 20:00 en 30:00 minuten verschijnt automatisch
+            een herinnering voor een keeperwissel.
+        </p>
+
+        <h3>📄 Wedstrijdrapport</h3>
+
+        <p>
+            Na afloop kan een rapport worden opgeslagen met score,
+            speeltijden, posities en wisselhistorie.
+        </p>
+
+        <h3>🎯 Doel van de app</h3>
+
+        <p>
+            Handbal WisselCoach ondersteunt coaches bij het bieden van
+            gelijke ontwikkelkansen, eerlijke speeltijd en meer rust
+            tijdens de wedstrijd.
+        </p>
+
+        <hr>
+
+        <p style="
+            font-size:12px;
+            color:#666;
+            text-align:center;
+            margin-top:15px;
+        ">
+            Handbal WisselCoach v1.2<br>
+        </p>
+
+        <button
+            id="infoCloseBtn"
+            onclick="closeInfoModal()">
+            Sluiten
+        </button>
+
+    </div>
+
+</div>
 <script>
+
+/*
+Handbal WisselCoach v1.2
+© 2026 Niels te Heemskerk
+Alle rechten voorbehouden.
+Ongeoorloofde reproductie of verspreiding is verboden.
+*/
 
 /* ===================================================== */
 /* GLOBALE VARIABELEN */
@@ -947,9 +1134,12 @@ let positionTimes = {};
 let currentLineup = {};
 let substitutionLog = [];
 let playerAvailable = {};
+let currentAdvice = [];
+let adviceCooldownUntil = 0;
 
 let matchArchive = [];
 let matchArchived = false;
+let alertTimeout = null;
 
 /* ===================================================== */
 /* TEAMBEHEER */
@@ -996,7 +1186,8 @@ function addPlayer(){
         "playerName"
     ).value = "";
 
-    renderPlayers();
+renderPlayers();
+saveTeam();
 }
 
 function saveTeam(){
@@ -1015,6 +1206,8 @@ document.getElementById("teamName")
     }
 
     const teamData = {
+
+	teamName,
 
         players,
 
@@ -1045,10 +1238,6 @@ document.getElementById(
 ).innerText =
 "Team: " + teamName;
 
-document
-.getElementById("teamManager")
-.classList.add("hidden");
-
 }
 
 function deleteTeam(){
@@ -1071,9 +1260,13 @@ function deleteTeam(){
         return;
     }
 
-    localStorage.removeItem(
-        "team_" + teamName
-    );
+localStorage.removeItem(
+    "team_" + teamName
+);
+
+localStorage.removeItem(
+    "activeMatch"
+);
 
     refreshTeamList();
 
@@ -1081,19 +1274,25 @@ players = [];
 playerHandedness = {};
 playerKeepers = {};
 playerAvailable = {};
-
 playTimes = {};
 benchCount = {};
 keeperTime = {};
 positionTimes = {};
 substitutionLog = [];
 currentLineup = {};
-
+currentAdvice = [];
+adviceCooldownUntil = 0;
 renderPlayers();
 
-renderSwitchCompass();
+document.getElementById("playerProfiles")
+.innerHTML =
+"Nog geen speelsters";
 
-renderPositionLists();
+document.getElementById("attendanceList")
+.innerHTML =
+"Nog geen speelsters";
+
+renderSwitchCompass();
 
 document.getElementById(
     "selectedTeamName"
@@ -1108,10 +1307,6 @@ document.getElementById(
     "teamName"
 ).value = "";
 
-document
-.getElementById("teamManager")
-.classList.add("hidden");
-
 }
 
 /* ===================================================== */
@@ -1121,8 +1316,6 @@ document
 function renderPlayers(){
 
     renderTeam();
-
-    renderPositionLists();
 
     renderProfiles();
 
@@ -1146,12 +1339,14 @@ function renderAttendance(){
             ? "checked"
             : ""}
 
-            onchange="
-            playerAvailable['${player}']
-            = this.checked;
-            renderPositionLists();
-            renderSwitchCompass();
-   	    "
+onchange="
+playerAvailable['${player}']
+= this.checked;
+
+renderSwitchCompass();
+
+saveTeam();
+"
 	    >
 
             ${player}
@@ -1186,20 +1381,18 @@ html += `
 <select
 onchange="
 playerHandedness['${player}']=this.value;
-"
->
+saveTeam();
+">
 
 <option
 value="right"
-${playerHandedness[player] === "right" ? "selected" : ""}
->
+${playerHandedness[player] === "right" ? "selected" : ""}>
 Rechtshandig
 </option>
 
 <option
 value="left"
-${playerHandedness[player] === "left" ? "selected" : ""}
->
+${playerHandedness[player] === "left" ? "selected" : ""}>
 Linkshandig
 </option>
 
@@ -1212,9 +1405,9 @@ type="checkbox"
 ${playerKeepers[player] ? "checked" : ""}
 onchange="
 playerKeepers['${player}']=this.checked;
-renderPositionLists();
-
-">
+saveTeam();
+"
+>
 
 Keeper
 
@@ -1224,7 +1417,9 @@ Keeper
 
 `;
         
-    });
+}
+
+);
 
     document.getElementById(
         "playerProfiles"
@@ -1244,9 +1439,27 @@ delete benchCount[removedPlayer];
 delete keeperTime[removedPlayer];
 delete positionTimes[removedPlayer];
 
-    players.splice(index,1);
+Object.keys(currentLineup)
+.forEach(position => {
 
-    renderPlayers();
+    if(currentLineup[position] === removedPlayer){
+
+        currentLineup[position] = "";
+
+    }
+
+});
+
+
+players.splice(index,1);
+
+renderPlayers();
+
+updateFieldDisplay();
+renderSubstitutionOptions();
+renderSubstitutionHistory();
+saveTeam();
+
 }
 
 function renderTeam(){
@@ -1270,99 +1483,6 @@ onclick="removePlayer(${index})">
 });
 
     document.getElementById("playerList").innerHTML=html;
-}
-
-function renderPositionLists(){
-
-    const ids = [
-        "keeper",
-        "pivot",
-        "leftBack",
-        "rightBack",
-        "leftCorner",
-        "rightCorner"
-    ];
-
-    const selected = {};
-
-    ids.forEach(id => {
-
-        const value =
-        document.getElementById(id)?.value;
-
-        if(value){
-            selected[id] = value;
-        }
-
-    });
-
-    ids.forEach(id => {
-
-        const currentValue =
-        selected[id];
-
-        let html =
-        '<option value="">-- kies --</option>';
-
-const availablePlayers =
-
-id === "keeper"
-
-? players.filter(
-    player =>
-    playerKeepers[player] &&
-    playerAvailable[player]
-)
-
-: players.filter(
-    player =>
-    playerAvailable[player]
-);
-
-availablePlayers.forEach(player => {
-
-    const alreadyUsed =
-
-    Object.entries(selected)
-    .some(
-
-        ([otherId,val]) =>
-
-        otherId !== id &&
-        val === player
-    );
-
-    if(
-        !alreadyUsed ||
-        player === currentValue
-    ){
-
-        const hand =
-
-        playerHandedness[player] === "left"
-
-        ? "LH"
-
-        : "RH";
-
-html +=
-
-`<option
-value="${player}"
-${player===currentValue?"selected":""}
->
-${player} (${hand})
-</option>`;
-    }
-
-});
-
-document
-.getElementById(id)
-.innerHTML = html;
-
-});
-
 }
 
 /* ===================================================== */
@@ -1397,6 +1517,8 @@ keeperTime = {};
 substitutionLog = [];
 currentLineup = {};
 positionTimes = {};
+currentAdvice = [];
+adviceCooldownUntil = 0;
 
 document.getElementById("homeScore").innerText = "0";
 document.getElementById("awayScore").innerText = "0";
@@ -1415,7 +1537,27 @@ document.getElementById("subAdvice").innerHTML =
 document.getElementById("playTimesView").innerHTML =
     	"Nog geen speeltijden";
 
-    	alert("Nieuwe wedstrijd gestart");
+document.getElementById("benchPlayers").innerHTML = "";
+
+document.getElementById("homeTeamLabel").innerText = "Thuis";
+
+document.getElementById("awayTeamLabel").innerText = "Uit";
+
+const fairPlay =
+document.getElementById("fairPlayStatus");
+
+fairPlay.innerHTML =
+"🟢 Team is in balans";
+
+fairPlay.style.color = "green";
+
+updateFieldDisplay();
+renderSubstitutionOptions();
+renderPlayingTimes();
+renderSubstitutionHistory();
+renderSwitchCompass();
+updateFairPlay();
+
 }
 
 function startMatch(){
@@ -1431,6 +1573,12 @@ document.getElementById("matchScreen").classList.remove("hidden");
 
 homeScore = 0;
 awayScore = 0;
+
+document.getElementById("homeTeamLabel").innerText =
+document.getElementById("homeTeamName").value || "Thuis";
+
+document.getElementById("awayTeamLabel").innerText =
+document.getElementById("awayTeamName").value || "Uit";
 
 document.getElementById("homeScore").innerText = 0;
 document.getElementById("awayScore").innerText = 0;
@@ -1484,140 +1632,38 @@ if(availablePlayers.length < 6){
     return;
 }
 
-    const starters = [
+const availableKeepers =
+players.filter(
+    player =>
+    playerKeepers[player] &&
+    playerAvailable[player]
+);
 
-        document.getElementById("keeper").value,
-        document.getElementById("pivot").value,
-        document.getElementById("leftBack").value,
-        document.getElementById("rightBack").value,
-        document.getElementById("leftCorner").value,
-        document.getElementById("rightCorner").value
+if(availableKeepers.length === 0){
 
-    ];
-
-    if (starters.includes("")) {
-
-        alert("Vul alle posities in");
-
-        return;
-    }
-
-    if(new Set(starters).size < 6){
-
-        alert(
-        "Iedere positie moet een andere speelster hebben"
-        );
-
-        return;
-    }
-
-availablePlayers.forEach(player => {
-
-    playTimes[player] = 0;
-
-    positionTimes[player] = {
-
-        keeper:0,
-        pivot:0,
-        leftBack:0,
-        rightBack:0,
-        leftCorner:0,
-        rightCorner:0
-
-    };
-
-    benchCount[player] =
-    starters.includes(player) ? 0 : 1;
-
-});
-
-    const homeTeam =
-
-    document.getElementById(
-        "homeTeamName"
-    ).value.trim() || "Thuis";
-
-    const awayTeam =
-
-    document.getElementById(
-        "awayTeamName"
-    ).value.trim() || "Uit";
-
-    document.getElementById(
-        "homeTeamLabel"
-    ).innerText = homeTeam;
-
-    document.getElementById(
-        "awayTeamLabel"
-    ).innerText = awayTeam;
-
-    document
-    .getElementById("prepScreen")
-    .classList.add("hidden");
-
-    document
-    .getElementById("matchScreen")
-    .classList.remove("hidden");
-
-    document.getElementById("mKeeper").innerText =
-    document.getElementById("keeper").value;
-
-    document.getElementById("mPivot").innerText =
-    document.getElementById("pivot").value;
-
-    document.getElementById("mLO").innerText =
-    document.getElementById("leftBack").value;
-
-    document.getElementById("mRO").innerText =
-    document.getElementById("rightBack").value;
-
-    document.getElementById("mLH").innerText =
-    document.getElementById("leftCorner").value;
-
-    document.getElementById("mRH").innerText =
-    document.getElementById("rightCorner").value;
-
-    currentLineup = {
-
-        keeper: document.getElementById("keeper").value,
-        pivot: document.getElementById("pivot").value,
-        leftBack: document.getElementById("leftBack").value,
-        rightBack: document.getElementById("rightBack").value,
-        leftCorner: document.getElementById("leftCorner").value,
-        rightCorner: document.getElementById("rightCorner").value
-
-    };
-
-    renderPlayingTimes();
-    renderSwitchCompass();
-    renderSubstitutionOptions();
-    renderSubstitutionHistory();
-    calculateSubAdvice();
-    updateFairPlay();
-    
-    const bench =
-    players.filter(
-    x =>
-    playerAvailable[x] &&
-    !starters.includes(x)
+    alert(
+        "Minimaal één beschikbare keeper vereist"
     );
 
+    return;
+}
 
-    document
-.getElementById("benchPlayers")
-.innerHTML =
+document.getElementById("prepScreen")
+.classList.add("hidden");
 
-bench.length
+document.getElementById("matchScreen")
+.classList.remove("hidden");
 
-? bench.map(player =>
+showLineupSetup();
+renderPlayingTimes();
+renderSwitchCompass();
+renderSubstitutionOptions();
+renderSubstitutionHistory();
+calculateSubAdvice();
+updateFairPlay();
+updateFieldDisplay();
+updateNextSwitchTimer();  
 
-`<span class="bench-chip">
-${player}
-</span>`
-
-).join("")
-
-: "Geen bankspelers";
 
 }
 
@@ -1704,15 +1750,22 @@ function startTimer(){
         return;
     }
     
-    timerInterval = setInterval(() => {
+timerInterval = setInterval(() => {
 
-        matchSeconds++;
+    matchSeconds++;
 
-        updateTimer();
+    updateTimer();
 
-        updatePlayingTimes();
+    updatePlayingTimes();
 
-    },1000);
+    updateNextSwitchTimer();
+
+    if(matchSeconds % 60 === 0){
+        saveMatchState();
+    }
+
+},1000);
+
 }
 
 function pauseTimer(){
@@ -1721,179 +1774,252 @@ function pauseTimer(){
 
     timerInterval = null;
 
+    saveMatchState();
+
 }
 
-function showHalftimeSetup(){
+function showLineupSetup(){
 
     const availablePlayers =
-    players.filter(
-        player =>
+    players.filter(player =>
         playerAvailable[player]
     );
 
-    const positions = {
+    const positions = [
+        "lineupKeeper",
+        "lineupPivot",
+        "lineupLeftBack",
+        "lineupRightBack",
+        "lineupLeftCorner",
+        "lineupRightCorner"
+    ];
 
-        halfKeeper: currentLineup.keeper,
-        halfPivot: currentLineup.pivot,
-        halfLeftBack: currentLineup.leftBack,
-        halfRightBack: currentLineup.rightBack,
-        halfLeftCorner: currentLineup.leftCorner,
-        halfRightCorner: currentLineup.rightCorner
-
-    };
-
-    Object.entries(positions)
-    .forEach(([id,currentPlayer]) => {
+    positions.forEach(id => {
 
         let html = "";
 
         availablePlayers.forEach(player => {
 
-            const keeperTag =
-playerKeepers[player]
-? " (KP)"
-: "";
+    let currentRole = "";
 
-const position =
-Object.keys(currentLineup)
-.find(pos => currentLineup[pos] === player);
+if(Object.keys(currentLineup).length > 0){
 
-const status =
-position
-? " • VELD (" + getPositionLabel(position) + ")"
-: " • BANK";
+    currentRole = "Bank";
 
-html += `
-<option
-value="${player}"
-${player===currentPlayer ? "selected" : ""}
->
-${player}${keeperTag}${status}
-</option>
-`;
-        });
+    Object.entries(currentLineup)
+    .forEach(([position,value]) => {
 
-        document.getElementById(id)
-        .innerHTML = html;
+        if(value === player){
+
+            const labels = {
+                keeper:"Keeper",
+                pivot:"CIR",
+                leftBack:"LO",
+                rightBack:"RO",
+                leftCorner:"LH",
+                rightCorner:"RH"
+            };
+
+            currentRole = labels[position];
+        }
 
     });
 
+}
+
+const profile = [];
+
+if(playerHandedness[player] === "left"){
+    profile.push("Links");
+}
+
+if(playerKeepers[player]){
+    profile.push("KP");
+}
+
+const profileText =
+profile.length
+? " · " + profile.join(" · ")
+: "";
+
+const roleText =
+currentRole
+? ` (${currentRole})`
+: "";
+
+html += `
+<option value="${player}">
+    ${player}${profileText}${roleText}
+</option>`;
+
+}
+
+);
+
+        document.getElementById(id).innerHTML =
+        html;
+
+    });
+
+if(currentLineup.leftBack){
+
+    document.getElementById(
+        "lineupLeftBack"
+    ).value =
+    currentLineup.leftBack;
+
+}
+
+if(currentLineup.rightBack){
+
+    document.getElementById(
+        "lineupRightBack"
+    ).value =
+    currentLineup.rightBack;
+
+}
+
+if(currentLineup.pivot){
+
+    document.getElementById(
+        "lineupPivot"
+    ).value =
+    currentLineup.pivot;
+
+}
+
+if(currentLineup.leftCorner){
+
+    document.getElementById(
+        "lineupLeftCorner"
+    ).value =
+    currentLineup.leftCorner;
+
+}
+
+if(currentLineup.rightCorner){
+
+    document.getElementById(
+        "lineupRightCorner"
+    ).value =
+    currentLineup.rightCorner;
+
+}
+
+if(currentLineup.keeper){
+
+    document.getElementById(
+        "lineupKeeper"
+    ).value =
+    currentLineup.keeper;
+
+}
+
     document
-    .getElementById("halftimeSetupCard")
+    .getElementById("lineupCard")
     .classList.remove("hidden");
 }
 
-function applyHalftimeLineup(){
+function closeLineupSetup(){
+
+    document
+    .getElementById("lineupCard")
+    .classList.add("hidden");
+
+}
+
+function applyLineup(){
 
     const lineup = {
 
         keeper:
-        document.getElementById("halfKeeper").value,
+        document.getElementById("lineupKeeper").value,
 
         pivot:
-        document.getElementById("halfPivot").value,
+        document.getElementById("lineupPivot").value,
 
         leftBack:
-        document.getElementById("halfLeftBack").value,
+        document.getElementById("lineupLeftBack").value,
 
         rightBack:
-        document.getElementById("halfRightBack").value,
+        document.getElementById("lineupRightBack").value,
 
         leftCorner:
-        document.getElementById("halfLeftCorner").value,
+        document.getElementById("lineupLeftCorner").value,
 
         rightCorner:
-        document.getElementById("halfRightCorner").value
-
+        document.getElementById("lineupRightCorner").value
     };
 
-    const starters =
+    const selected =
     Object.values(lineup);
 
-    if(new Set(starters).size < 6){
+    if(new Set(selected).size < 6){
 
         alert(
-            "Iedere positie moet een andere speelster hebben"
+        "Iedere positie moet een andere speelster hebben"
         );
 
         return;
     }
 
-    const oldFieldPlayers =
-Object.values(currentLineup);
+    currentLineup = lineup;
 
-const newFieldPlayers =
-Object.values(lineup);
+Object.values(currentLineup).forEach(player => {
 
-// speelsters die naar de bank gaan
-oldFieldPlayers.forEach(player => {
-
-    if(!newFieldPlayers.includes(player)){
-
-        benchCount[player] =
-        (benchCount[player] || 0) + 1;
+    if(!playTimes[player]){
+        playTimes[player] = 0;
     }
 
-});
+    if(!keeperTime[player]){
+        keeperTime[player] = 0;
+    }
 
-Object.keys(lineup).forEach(position => {
+    if(!positionTimes[player]){
 
-    const oldPlayer =
-    currentLineup[position];
+        positionTimes[player] = {
 
-    const newPlayer =
-    lineup[position];
+            keeper:0,
+            pivot:0,
+            leftBack:0,
+            rightBack:0,
+            leftCorner:0,
+            rightCorner:0
 
-    if(oldPlayer !== newPlayer){
-
-        substitutionLog.unshift({
-
-            minute: "Rust",
-
-            position: getPositionLabel(position),
-
-            incoming: newPlayer,
-
-            outgoing: oldPlayer
-
-        });
+        };
 
     }
 
 });
 
-currentLineup = lineup;
-updateFieldDisplay();
-renderSubstitutionOptions();
-renderSubstitutionHistory();
-calculateSubAdvice();
-updateFairPlay();
-saveMatchState();
+    updateFieldDisplay();
+    renderSubstitutionOptions();
+    renderSubstitutionHistory();
+    calculateSubAdvice();
+    updateFairPlay();
 
     document
-    .getElementById("halftimeSetupCard")
+    .getElementById("lineupCard")
     .classList.add("hidden");
 
-    document.getElementById(
-        "matchPhase"
-    ).innerText = "2e Helft";
-
+    saveMatchState();
 }
-
 function showAlertBanner(message){
 
     const banner =
     document.getElementById("alertBanner");
 
-    banner.innerText = message;
+    banner.innerHTML = message;
 
     banner.style.display = "block";
 
-    setTimeout(() => {
+    clearTimeout(alertTimeout);
+
+    alertTimeout = setTimeout(() => {
 
         banner.style.display = "none";
 
-    }, 10000);
+    },10000);
 }
 
 function updateTimer(){
@@ -1941,8 +2067,6 @@ if(matchSeconds === 1200){
 showAlertBanner(
         "⏰ Rust"
 );
-
-showHalftimeSetup();
 
 pauseTimer();
 
@@ -2000,18 +2124,74 @@ document
 
 }
 
-if(matchSeconds % 60 === 0 &&
-   matchSeconds < 2400){
-
-    saveMatchState();
-
-}
-
 }
 
 /* ===================================================== */
 /* SPEELTIJDEN & ADVIEZEN */
 /* ===================================================== */
+
+function updateNextSwitchTimer(){
+
+    const switchMoments = [
+
+        { time: 300,  label: "05:00" },
+        { time: 600,  label: "10:00 (Time-out)" },
+        { time: 900,  label: "15:00" },
+        { time: 1200, label: "20:00 (Rust)" },
+
+        { time: 1500, label: "25:00" },
+        { time: 1800, label: "30:00 (Time-out)" },
+        { time: 2100, label: "35:00" },
+        { time: 2400, label: "40:00 (Einde)" }
+
+    ];
+
+    const card =
+    document.getElementById("nextSwitchTimer");
+
+    const nextMoment =
+    switchMoments.find(
+        moment => matchSeconds < moment.time
+    );
+
+    if(!nextMoment){
+
+        card.innerHTML =
+        "🏁 Wedstrijd afgelopen";
+
+        card.style.background = "#eeeeee";
+        card.style.color = "#424242";
+
+        return;
+    }
+
+    const remaining =
+    nextMoment.time - matchSeconds;
+
+    card.innerHTML =
+    `⏱ Wisselmoment op ${nextMoment.label}`;
+
+    // Normaal
+    card.style.background = "#e8f5e9";
+    card.style.color = "#2e7d32";
+
+    // Laatste 2 minuten = oranje
+    if(remaining <= 120 && remaining > 60){
+
+        card.style.background = "#fff3e0";
+        card.style.color = "#ef6c00";
+
+    }
+
+    // Laatste minuut = rood
+    if(remaining <= 60){
+
+        card.style.background = "#ffebee";
+        card.style.color = "#c62828";
+
+    }
+
+}
 
 function updatePlayingTimes(){
 
@@ -2020,9 +2200,10 @@ function updatePlayingTimes(){
 
     activePlayers.forEach(player => {
 
-        playTimes[player]++;
+    playTimes[player] =
+    (playTimes[player] || 0) + 1;
 
-    });
+});
 
     const currentKeeper =
     currentLineup.keeper;
@@ -2144,10 +2325,7 @@ Object.entries(positionTimes[player] || {})
     if(position === currentPosition){
 
         currentPositionText =
-        labels[position] +
-        " (" +
-        Math.floor(time / 60) +
-        "m)";
+        labels[position];
 
     } else {
 
@@ -2168,6 +2346,7 @@ grid-template-columns:120px 60px 1fr;
 gap:10px;
 color:${color};
 font-weight:bold;
+font-size:14px;
 margin-bottom:6px;
 ">
 
@@ -2175,12 +2354,13 @@ margin-bottom:6px;
 
     <span>${minutes}m</span>
 
-    <span style="font-weight:normal;">
+    <span>
         ${currentPositionText}
 
         <span style="
             font-size:11px;
             color:#888;
+            font-weight:normal;
         ">
             ${
                 previousPositions.length
@@ -2192,8 +2372,7 @@ margin-bottom:6px;
 
 </div>
 
-`;
-    });
+`;    });
 
     document
     .getElementById("playTimesView")
@@ -2207,40 +2386,33 @@ function renderSwitchCompass(){
     const availableCount =
 
     players.filter(
-        player =>
-        playerAvailable[player]
+        player => playerAvailable[player]
     ).length;
 
     if(availableCount === 10){
 
         html = `
-        <b>Wisselmomenten (minuten)</b>
+        <b>10 speelsters</b>
         <br><br>
-        5 | 10 | 15 | R | 25 | 30 | 35
-        <br><br>
-        <b>2 wissels per moment</b>
+        2 wissels elke 5 minuten
         `;
     }
 
     else if(availableCount === 9){
 
         html = `
-        <b>Wisselmomenten (minuten)</b>
+        <b>9 speelsters</b>
         <br><br>
-        5 | 15 | R | 25 | 35
-        <br><br>
-        <b>3 wissels per moment</b>
+        3 wissels elke 5 minuten
         `;
     }
 
     else if(availableCount === 8){
 
         html = `
-        <b>Wisselmomenten (minuten)</b>
+        <b>8 speelsters</b>
         <br><br>
-        5 | 15 | R | 25 | 35
-        <br><br>
-        <b>2 wissels per moment</b>
+        2 wissels elke 5 minuten
         `;
     }
 
@@ -2276,14 +2448,11 @@ let html = "";
 
 availablePlayers.forEach(player => {
 
-    const hand =
-playerHandedness[player] === "left"
-? "LH"
-: "RH";
-
 const profile = [];
 
-profile.push(hand);
+if(playerHandedness[player] === "left"){
+    profile.push("Links");
+}
 
 if(playerKeepers[player]){
     profile.push("KP");
@@ -2291,7 +2460,8 @@ if(playerKeepers[player]){
 
 html += `
 <option value="${player}">
-    ${player} (${profile.join(", ")})
+    ${player}
+    ${profile.length ? " (" + profile.join(", ") + ")" : ""}
 </option>
 `;
 });
@@ -2364,6 +2534,7 @@ function getPositionLabel(position){
     return labels[position] || position;
 }
 
+
 /* ===================================================== */
 /* OPSTELLING & WISSELS */
 /* ===================================================== */
@@ -2405,6 +2576,29 @@ if(previousPosition){
 
 currentLineup[position] = incoming;
 
+if(!playTimes[incoming]){
+    playTimes[incoming] = 0;
+}
+
+if(!keeperTime[incoming]){
+    keeperTime[incoming] = 0;
+}
+
+if(!positionTimes[incoming]){
+
+    positionTimes[incoming] = {
+
+        keeper:0,
+        pivot:0,
+        leftBack:0,
+        rightBack:0,
+        leftCorner:0,
+        rightCorner:0
+
+    };
+
+}
+
 if(outgoing){
 
     benchCount[outgoing] =
@@ -2432,14 +2626,46 @@ substitutionLog.unshift({
 
 });
 
+currentAdvice =
+currentAdvice.filter(advice =>
+    !(
+        advice.incoming === incoming &&
+        advice.outgoing === outgoing
+    )
+);
+
+if(currentAdvice.length === 0){
+
+    adviceCooldownUntil =
+    matchSeconds + 120;
+
+}
+
 renderSubstitutionHistory();
 calculateSubAdvice();
 saveMatchState();
-
 }
 
 function updateFieldDisplay(){
 
+    // Nog geen opstelling ingevuld
+
+if(Object.keys(currentLineup).length === 0){
+
+    document.getElementById("mKeeper").innerText = "";
+    document.getElementById("mPivot").innerText = "";
+    document.getElementById("mLO").innerText = "";
+    document.getElementById("mRO").innerText = "";
+    document.getElementById("mLH").innerText = "";
+    document.getElementById("mRH").innerText = "";
+
+    document.getElementById("benchPlayers").innerHTML =
+    "Opstelling nog niet ingevuld";
+
+    return;
+}
+
+    // Veldposities tonen
     document.getElementById("mKeeper").innerText =
     currentLineup.keeper || "⚠️ Open";
 
@@ -2458,6 +2684,7 @@ function updateFieldDisplay(){
     document.getElementById("mRH").innerText =
     currentLineup.rightCorner || "⚠️ Open";
 
+    // Bankspelers bepalen
     const fieldPlayers =
     Object.values(currentLineup);
 
@@ -2484,6 +2711,7 @@ function updateFieldDisplay(){
 
     : "Geen bankspelers";
 
+    // Controle of alle 6 posities gevuld zijn
     const activeCount =
     Object.values(currentLineup)
     .filter(Boolean)
@@ -2491,27 +2719,82 @@ function updateFieldDisplay(){
 
     if(activeCount < 6){
 
-        showAlertBanner(
-            "⚠️ Opstelling onvolledig (" +
-            activeCount +
-            "/6)"
-        );
+        const labels = {
+            keeper: "Keeper",
+            pivot: "Cirkellijn",
+            leftBack: "Linkeropbouw",
+            rightBack: "Rechteropbouw",
+            leftCorner: "Linkerhoek",
+            rightCorner: "Rechterhoek"
+        };
 
-    }
+        const openPositions = [];
+
+        Object.entries(currentLineup)
+        .forEach(([position, player]) => {
+
+            if(!player){
+
+                openPositions.push(
+                    labels[position]
+                );
+
+            }
+
+        });
+
+showAlertBanner(
+    "⚙️ Open posities: " +
+    openPositions.join(", ")
+);
+
+}
 
 }
 
 function calculateSubAdvice(){
 
-    if(matchSeconds < 120){
+    if(matchSeconds < 60){
 
         document
         .getElementById("subAdvice")
         .innerHTML =
-        "Wisseladvies beschikbaar vanaf 2 minuten speeltijd";
+        "Wisseladvies beschikbaar vanaf 1 minuut speeltijd";
 
         return;
     }
+
+if(adviceCooldownUntil > matchSeconds){
+
+    const remaining =
+    adviceCooldownUntil - matchSeconds;
+
+    const minutes =
+    Math.floor(remaining / 60);
+
+    const seconds =
+    String(remaining % 60)
+    .padStart(2,"0");
+
+    document
+    .getElementById("subAdvice")
+    .innerHTML = `
+        <div style="
+            color:#1565c0;
+            font-weight:bold;
+            margin-bottom:8px;
+        ">
+            ⏳ Recente wissel(s) uitgevoerd
+        </div>
+
+        <div>
+            Volgend advies over
+            ${minutes}:${seconds}
+        </div>
+    `;
+
+    return;
+}
 
 const availableCount =
 players.filter(
@@ -2566,6 +2849,39 @@ else if(availableCount === 8){
         return;
     }
 
+const allTimes =
+players
+.filter(player => playerAvailable[player])
+.map(player => getTotalPlayTime(player));
+
+const maxTime =
+Math.max(...allTimes);
+
+const minTime =
+Math.min(...allTimes);
+
+const difference =
+maxTime - minTime;
+
+if(difference < 90){
+
+    document
+    .getElementById("subAdvice")
+    .innerHTML = `
+        <div style="
+            color:#2e7d32;
+            font-weight:bold;
+            margin-bottom:10px;
+        ">
+            ✅ Speeltijden zijn goed in balans
+        </div>
+
+        Geen wisseladvies nodig op basis van speeltijd.
+    `;
+
+    return;
+}
+
 const sortedFieldPlayers =
 fieldPlayers
 .slice()
@@ -2584,8 +2900,10 @@ benchPlayers
     getTotalPlayTime(b)
 );
 
+currentAdvice = [];
+
 let adviceHtml = `
-<b>🎯 Geadviseerde wissels</b>
+<b>Geadviseerde wissels</b>
 <br><br>
 `;
 
@@ -2611,6 +2929,12 @@ for(
         pos =>
         currentLineup[pos] === outgoing
     );
+
+currentAdvice.push({
+    incoming,
+    outgoing,
+    position
+});
 
     adviceHtml += `
     <div style="
@@ -2657,12 +2981,20 @@ function updateFairPlay(){
 
 const times =
 players
-.filter(player => playerAvailable[player])
+.filter(player =>
+    playerAvailable[player]
+)
 .map(player => getTotalPlayTime(player));
 
-    if(times.length === 0){
-        return;
-    }
+if(times.length < 2){
+
+    document.getElementById(
+        "fairPlayStatus"
+    ).innerHTML =
+    "🟢 Nog onvoldoende speeltijd";
+
+    return;
+}
 
     const max =
     Math.max(...times);
@@ -2670,52 +3002,43 @@ players
     const min =
     Math.min(...times);
 
-    const diff =
-    Math.floor((max-min)/60);
+const diffSeconds = max - min;
+const diffMinutes = (diffSeconds / 60).toFixed(1);
 
     const status =
     document.getElementById(
         "fairPlayStatus"
     );
 
-    if(diff >= 10){
+    if(diffSeconds >= 300){
 
-        status.innerHTML =
+    status.innerHTML =
+    "🔴 Groot verschil: " +
+    diffMinutes +
+    " minuten";
 
-        "🔴 Groot verschil: " +
-        diff +
-        " minuten";
+    status.style.color = "red";
 
-        status.style.color =
-        "red";
-    }
-    else if(diff >= 5){
+}
+else if(diffSeconds >= 180){
 
-        status.innerHTML =
+    status.innerHTML =
+    "🟠 Let op: " +
+    diffMinutes +
+    " minuten verschil";
 
-        "🟠 Let op: " +
-        diff +
-        " minuten verschil";
+    status.style.color = "orange";
 
-        status.style.color =
-        "orange";
-    }
-    else{
+}
+else{
 
-        status.innerHTML =
+    status.innerHTML =
+    "🟢 Speeltijden zijn in balans";
 
-        "🟢 Speeltijden zijn in balans";
+    status.style.color = "green";
 
-        status.style.color =
-        "green";
-    }
 }
 
-function toggleTeamManager(){
-
-    document
-    .getElementById("teamManager")
-    .classList.toggle("hidden");
 }
 
 function refreshTeamList(){
@@ -2829,10 +3152,6 @@ document
 .classList.add("hidden");
 
     renderSwitchCompass();
-
-document
-.getElementById("teamManager")
-.classList.add("hidden");
 
 }
 
@@ -3290,11 +3609,6 @@ function downloadArchivedMatch(id){
 
 <style>
 
-body{
-    font-family:Arial,sans-serif;
-    margin:30px;
-}
-
 h1,h2{
     color:#002B5C;
 }
@@ -3324,6 +3638,10 @@ th{
 </style>
 
 </head>
+
+<!-- ===================================================== -->
+<!-- HTML STRUCTUUR -->
+<!-- ===================================================== -->
 
 <body>
 
@@ -3492,9 +3810,13 @@ const match = {
 
 };
 
-    matchArchive.unshift(match);
+matchArchive.unshift(match);
 
-    saveArchive();
+if(matchArchive.length > 50){
+    matchArchive.pop();
+}
+
+saveArchive();
 
 }
 
@@ -3502,22 +3824,27 @@ function saveMatchState(){
 
     const state = {
 
-        matchSeconds,
-        homeScore,
-        awayScore,
+timerRunning: timerInterval !== null,
 
-   players,
-   playerAvailable,
-   playerHandedness,
-   playerKeepers,
+matchSeconds,
+homeScore,
+awayScore,
 
-        playTimes,
-        keeperTime,
-        positionTimes,
+players,
+playerAvailable,
+playerHandedness,
+playerKeepers,
 
-        currentLineup,
-        substitutionLog,
-        benchCount,
+playTimes,
+keeperTime,
+positionTimes,
+
+currentAdvice,
+adviceCooldownUntil,
+
+currentLineup,
+substitutionLog,
+benchCount,
 
         homeTeam:
             document.getElementById("homeTeamLabel").innerText,
@@ -3567,16 +3894,18 @@ document.getElementById("homeTeamName").value =
 document.getElementById("awayTeamName").value =
     state.awayTeamInput || "";
 
-  players = state.players || [];
-  playerAvailable = state.playerAvailable || {};
-  playerHandedness = state.playerHandedness || {};
-  playerKeepers = state.playerKeepers || {};
-    playTimes = state.playTimes || {};
-    keeperTime = state.keeperTime || {};
-    positionTimes = state.positionTimes || {};
-    currentLineup = state.currentLineup || {};
-    substitutionLog = state.substitutionLog || [];
-    benchCount = state.benchCount || {};
+players = state.players || [];
+playerAvailable = state.playerAvailable || {};
+playerHandedness = state.playerHandedness || {};
+playerKeepers = state.playerKeepers || {};
+playTimes = state.playTimes || {};
+keeperTime = state.keeperTime || {};
+positionTimes = state.positionTimes || {};
+currentLineup = state.currentLineup || {};
+substitutionLog = state.substitutionLog || [];
+benchCount = state.benchCount || {};
+currentAdvice = state.currentAdvice || [];
+adviceCooldownUntil = state.adviceCooldownUntil || 0;
 
     if(
         confirm(
@@ -3607,6 +3936,15 @@ renderPlayingTimes();
 calculateSubAdvice();
 updateFairPlay();
 saveMatchState();
+updateNextSwitchTimer();
+
+if(
+    state.timerRunning &&
+    matchSeconds > 0 &&
+    matchSeconds < 2400
+){
+    startTimer();
+}
 
 }
 else{
@@ -3615,8 +3953,8 @@ else{
         "activeMatch"
     );
 
-  return;
-    
+    location.reload();
+
 }
 
 } 
@@ -3745,11 +4083,6 @@ else if(fairPlayDiff >= 5){
 <title>Wedstrijdrapport</title>
 
 <style>
-
-body{
-    font-family:Arial,sans-serif;
-    margin:30px;
-}
 
 h1,h2{
     color:#002B5C;
@@ -3991,7 +4324,15 @@ Object.keys(currentLineup).find(
 );
 
 if(fieldPosition){
+
     currentLineup[fieldPosition] = "";
+
+    showAlertBanner(
+        "⚠️ Vergeet geen nieuwe speelster op " +
+        getPositionLabel(fieldPosition) +
+        " te plaatsen."
+    );
+
 }
 
 currentLineup.keeper = newKeeper;
@@ -4018,6 +4359,7 @@ updateFieldDisplay();
 renderSubstitutionHistory();
 renderSubstitutionOptions();
 calculateSubAdvice();
+updateFairPlay();
 
     document
     .getElementById(
@@ -4047,18 +4389,23 @@ document
 .getElementById("keeperSwapCard")
 .classList.add("hidden");
 
-document
-.getElementById("halftimeSetupCard")
-.classList.add("hidden");
+const lineupCard =
+document.getElementById("lineupCard");
+
+if(lineupCard){
+    lineupCard.classList.add("hidden");
+}
 
 document
 .getElementById("matchScreen")
 .classList.add("hidden");
 
-
 document
 .getElementById("prepScreen")
 .classList.remove("hidden");
+
+saveMatchState();
+
 }
 
 function toggleCard(id){
@@ -4066,6 +4413,22 @@ function toggleCard(id){
     document
     .getElementById(id)
     .classList.toggle("hidden");
+
+}
+
+function showInfoModal(){
+
+    document.getElementById(
+        "infoModal"
+    ).style.display = "block";
+
+}
+
+function closeInfoModal(){
+
+    document.getElementById(
+        "infoModal"
+    ).style.display = "none";
 
 }
 
@@ -4079,7 +4442,18 @@ window.onload = function () {
 
     loadArchive();
 
-   restoreMatchState();
+    restoreMatchState();
+
+    if(!localStorage.getItem("coachInfoSeen")){
+
+        showInfoModal();
+
+        localStorage.setItem(
+            "coachInfoSeen",
+            "true"
+        );
+
+    }
 
 };
 

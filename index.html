@@ -24,12 +24,6 @@ Ongeoorloofde reproductie of verspreiding is verboden.
     box-sizing:border-box;
 }
 
-body{
-    font-family:Arial,sans-serif;
-    margin:0;
-    background:#f4f5f7;
-}
-
 .header{
     background:#002B5C;
     color:white;
@@ -79,7 +73,7 @@ select{
 }
 
 .hidden{
-    display:none;
+    display:none !important;
 }
 
 .position{
@@ -101,17 +95,6 @@ select{
     gap:8px;
 }
 
-.field-position{
-    background:#eef2f7;
-    border-radius:10px;
-    padding:10px 4px;
-    text-align:center;
-    min-height:78px;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-}
-
 .field-label{
     font-size:12px;
     font-weight:bold;
@@ -123,6 +106,12 @@ select{
     font-size:14px;
     font-weight:bold;
     word-break:break-word;
+}
+
+.empty-position{
+    color:#1565c0;
+    font-style:italic;
+    font-weight:normal;
 }
 
 .keeper-row{
@@ -244,6 +233,22 @@ select{
 #switchCompass{
     font-size:14px;
     line-height:1.5;
+}
+
+.field-position{
+    background:#eef2f7;
+    border-radius:10px;
+    padding:10px 4px;
+    text-align:center;
+    min-height:78px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    cursor:pointer;
+}
+
+.field-position:hover{
+    background:#dde6f2;
 }
 
 .timer-box{
@@ -373,6 +378,22 @@ body{
 
 <div class="header">
 
+<div
+id="alertBanner"
+style="
+display:none;
+background:#dff0d8;
+border:1px solid #4caf50;
+padding:12px;
+margin:10px;
+border-radius:8px;
+font-weight:bold;
+color:#2e7d32;
+">
+
+</div>
+
+
     <span>Handbal WisselCoach</span>
 
     <button id="infoButton" onclick="showInfoModal()">
@@ -413,7 +434,7 @@ body{
 id="teamManager"
 class="card">
 
-    <h2>⚙️ Teambeheer</h2>
+    <h2>Teambeheer</h2>
 
     <label>Opgeslagen teams</label>
 
@@ -436,9 +457,9 @@ onchange="loadSelectedTeam()">
     id="teamName"
     placeholder="Bijv. D1">
 
-    <button onclick="saveTeam()">
-        Team opslaan
-    </button>
+<button onclick="saveTeam(true)">
+    Team opslaan
+</button>
 
 <button
 onclick="showArchive()"
@@ -524,7 +545,7 @@ Nog geen speelsters
 
 <div class="card">
 
-<h2>🏐 Wedstrijdgegevens</h2>
+<h2>Wedstrijdgegevens</h2>
 
 <label>Thuisteam</label>
 <input type="text" id="homeTeamName" placeholder="Bijv. DSS">
@@ -534,15 +555,22 @@ Nog geen speelsters
 
 </div>
 
-<button
-onclick="newMatch()"
-style="background:#c62828; margin-bottom:10px;">
-    🗑 Nieuwe wedstrijd
+<button id="startMatchBtn" onclick="startMatch()">
+Wedstrijd openen
 </button>
 
-<button id="startMatchBtn" onclick="startMatch()">
-🏐 Wedstrijd openen
+<button
+onclick="resetMatch()"
+style="
+background:#1565c0;
+margin-top:8px;
+margin-bottom:10px;">
+Wedstrijd resetten
 </button>
+
+<div class="watermark">
+    Handbal WisselCoach v1.2 • © 2026 Niels te Heemskerk
+</div>
 
 </div>
 
@@ -553,55 +581,6 @@ style="background:#c62828; margin-bottom:10px;">
 
 <div id="matchScreen"
 class="container hidden">
-
-<div
-id="alertBanner"
-style="
-display:none;
-background:#fff3cd;
-border:1px solid #ffe082;
-padding:12px;
-margin-bottom:12px;
-border-radius:8px;
-font-weight:bold;
-">
-</div>
-
-<div
-id="keeperSwapCard"
-class="card hidden"
->
-
-    <h2>🥅 Keeperwissel</h2>
-
-    <div
-    id="currentKeeperDisplay"
-    style="margin-bottom:10px;font-weight:bold;"
-    >
-    </div>
-
-    <label>Nieuwe keeper</label>
-
-    <select id="newKeeperSelect"></select>
-
-    <button
-    onclick="performKeeperSwap()"
-    style="margin-top:10px;"
-    >
-        Keeper wisselen
-    </button>
-
-    <div
-    id="keeperSwapResult"
-    style="
-    margin-top:10px;
-    color:#2e7d32;
-    font-weight:bold;
-    "
-    >
-    </div>
-
-</div>
 
 <div class="card">
 
@@ -712,27 +691,37 @@ onclick="undoAwayGoal()">
 
         <div class="field-row">
 
-            <div class="field-position">
+            <div class="field-position"
+                 onclick="editPosition('leftCorner')"
+                 style="cursor:pointer;">
                 <div class="field-label">LH</div>
                 <div id="mLH" class="field-player"></div>
             </div>
 
-            <div class="field-position">
+            <div class="field-position"
+                 onclick="editPosition('leftBack')"
+                 style="cursor:pointer;">
                 <div class="field-label">LO</div>
                 <div id="mLO" class="field-player"></div>
             </div>
 
-            <div class="field-position">
+            <div class="field-position"
+                 onclick="editPosition('pivot')"
+                 style="cursor:pointer;">
                 <div class="field-label">CIR</div>
                 <div id="mPivot" class="field-player"></div>
             </div>
 
-            <div class="field-position">
+            <div class="field-position"
+                 onclick="editPosition('rightBack')"
+                 style="cursor:pointer;">
                 <div class="field-label">RO</div>
                 <div id="mRO" class="field-player"></div>
             </div>
 
-            <div class="field-position">
+            <div class="field-position"
+                 onclick="editPosition('rightCorner')"
+                 style="cursor:pointer;">
                 <div class="field-label">RH</div>
                 <div id="mRH" class="field-player"></div>
             </div>
@@ -741,9 +730,14 @@ onclick="undoAwayGoal()">
 
         <div class="keeper-row">
 
-            <div class="field-position keeper-position">
+            <div class="field-position keeper-position"
+                 onclick="editPosition('keeper')"
+                 style="cursor:pointer;">
+
                 <div class="field-label">KEEPER</div>
+
                 <div id="mKeeper" class="field-player"></div>
+
             </div>
 
         </div>
@@ -756,95 +750,11 @@ onclick="undoAwayGoal()">
 
         <strong>Reservespelers</strong>
 
-        <div
-        id="benchPlayers"
-        style="margin-top:10px;">
+        <div id="benchPlayers"
+             style="margin-top:10px;">
         </div>
 
     </div>
-
-    <button
-    onclick="showLineupSetup()"
-    style="margin-top:15px;">
-        ⚙️ Opstelling aanpassen
-    </button>
-
-</div>
-
-<div id="lineupCard"
-class="card hidden">
-
-<div style="
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin-bottom:12px;
-">
-
-<h2 style="margin:0;">
-⚙️ Opstelling aanpassen
-</h2>
-
-<span
-onclick="closeLineupSetup()"
-style="
-cursor:pointer;
-font-size:24px;
-font-weight:bold;
-color:#666;
-">
-✖
-</span>
-
-</div>
-
-<div class="position">
-Keeper
-<select id="lineupKeeper"></select>
-</div>
-
-<div class="position">
-Cirkellijn
-<select id="lineupPivot"></select>
-</div>
-
-<div class="position">
-Linkeropbouw
-<select id="lineupLeftBack"></select>
-</div>
-
-<div class="position">
-Rechteropbouw
-<select id="lineupRightBack"></select>
-</div>
-
-<div class="position">
-Linkerhoek
-<select id="lineupLeftCorner"></select>
-</div>
-
-<div class="position">
-Rechterhoek
-<select id="lineupRightCorner"></select>
-</div>
-
-<div style="display:flex;gap:10px;">
-
-<button
-onclick="applyLineup()"
-style="flex:1;">
-✅ Opslaan
-</button>
-
-<button
-onclick="closeLineupSetup()"
-style="
-flex:1;
-background:#757575;">
-❌ Annuleren
-</button>
-
-</div>
 
 </div>
 
@@ -871,43 +781,6 @@ color:#2e7d32;
 Nog geen advies
 
 </div>
-
-<hr style="margin:15px 0;">
-
-<h3>Snelle wissel</h3>
-
-<div>
-
-Positie
-
-<select id="subPosition">
-
-<option value="keeper">Keeper</option>
-<option value="pivot">Cirkellijn</option>
-<option value="leftBack">Linkeropbouw</option>
-<option value="rightBack">Rechteropbouw</option>
-<option value="leftCorner">Linkerhoek</option>
-<option value="rightCorner">Rechterhoek</option>
-
-</select>
-
-</div>
-
-<br>
-
-<div>
-
-Speelster van bank
-
-<select id="subIn"></select>
-
-</div>
-
-<br>
-
-<button onclick="makeSubstitution()">
-Wissel uitvoeren
-</button>
 
 </div>
 
@@ -944,21 +817,22 @@ Nog geen speeltijden
 
 <div class="card">
 
-    <h2>Wisselkompas</h2>
-
-    <div id="switchCompass">
-        Nog niet beschikbaar
-    </div>
-
-</div>
-
-<div class="card">
-
 <h2>Wisselhistorie</h2>
 
 <div id="substitutionHistory">
 
 Nog geen wissels
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>Wisselkompas</h2>
+
+<div id="switchCompass">
+Nog niet beschikbaar
 
 </div>
 
@@ -1025,84 +899,126 @@ Sluiten
 
     <div id="infoContent">
 
-        <h2>🏐 Welkom bij Handbal WisselCoach</h2>
+<h2>Welkom bij Handbal WisselCoach</h2>
 
-        <p>
-            Deze app helpt coaches om speeltijden eerlijk te verdelen,
-            wisselmomenten te organiseren en wedstrijden overzichtelijk
-            vast te leggen.
-        </p>
+<p>
+    Handbal WisselCoach helpt coaches om tijdens wedstrijden
+    overzicht te houden, speeltijden eerlijk te verdelen en
+    wisselmomenten eenvoudig te organiseren.
+</p>
 
-        <h3>✅ Snelle start</h3>
+<h3>🚀 Snel starten</h3>
 
-        <ul>
-            <li>Laad of maak een team</li>
-            <li>Controleer aanwezigheid</li>
-            <li>Leg per speelster kenmerken vast</li>
-            <li>Vul thuis- en uitteam in</li>
-            <li>Open de wedstrijd</li>
-            <li>Stel de beginopstelling vast</li>
-            <li>Start de timer</li>
-        </ul>
+<ol>
+    <li>Laad of maak een team.</li>
+    <li>Controleer welke speelsters aanwezig zijn.</li>
+    <li>Markeer eventuele keepers.</li>
+    <li>Vul thuis- en uitteam in.</li>
+    <li>Open de wedstrijd.</li>
+    <li>Stel de veldopstelling samen.</li>
+    <li>Start de timer.</li>
+</ol>
 
-        <h3>🔄 Wisseladviezen</h3>
+<h3>🎯 Tijdens de wedstrijd</h3>
 
-        <p>
-            De WisselCoach vergelijkt automatisch speeltijden en
-            adviseert welke speelsters kunnen wisselen zodat de
-            belasting zo eerlijk mogelijk verdeeld blijft.
-        </p>
+<ul>
+    <li>Tik op een positie om een speelster te plaatsen of te wisselen.</li>
+    <li>De app houdt automatisch speeltijden bij.</li>
+    <li>Wissels worden vastgelegd in de wisselhistorie.</li>
+    <li>Het wisselcentrum geeft advies wanneer speelsters achterlopen in speeltijd.</li>
+</ul>
 
-        <h3>⚖️ Fair Play</h3>
+<h3>⚖️ Fair Play</h3>
 
-        <ul>
-            <li>🟢 0-2 minuten verschil</li>
-            <li>🟠 3-4 minuten verschil</li>
-            <li>🔴 5+ minuten verschil</li>
-        </ul>
+<p>
+    De Fair Play-indicator bewaakt of speelsters vergelijkbare
+    speeltijden krijgen.
+</p>
 
-        <h3>🥅 Keeperwissels</h3>
+<ul>
+    <li>🟢 Goed in balans</li>
+    <li>🟠 Let op verschillen</li>
+    <li>🔴 Grote verschillen</li>
+</ul>
 
-        <p>
-            Rond 10:00, 20:00 en 30:00 minuten verschijnt automatisch
-            een herinnering voor een keeperwissel.
-        </p>
+<p>
+    Het doel is om iedere speelster voldoende ontwikkel- en
+    speeltijd te geven.
+</p>
 
-        <h3>📄 Wedstrijdrapport</h3>
+<h3>🔄 Wisseladviezen</h3>
 
-        <p>
-            Na afloop kan een rapport worden opgeslagen met score,
-            speeltijden, posities en wisselhistorie.
-        </p>
+<p>
+    De wisseladviezen zijn gebaseerd op actuele speeltijd,
+    beschikbare bankspelers en de verdeling van speelminuten.
+</p>
 
-        <h3>🎯 Doel van de app</h3>
+<p>
+    De coach bepaalt altijd zelf of een advies wordt opgevolgd.
+</p>
 
-        <p>
-            Handbal WisselCoach ondersteunt coaches bij het bieden van
-            gelijke ontwikkelkansen, eerlijke speeltijd en meer rust
-            tijdens de wedstrijd.
-        </p>
+<h3>📊 Na de wedstrijd</h3>
 
-        <hr>
+<ul>
+    <li>Bekijk speeltijden per speelster.</li>
+    <li>Bekijk de volledige wisselhistorie.</li>
+    <li>Download een wedstrijdrapport.</li>
+    <li>Bewaar wedstrijden in het archief.</li>
+</ul>
 
-        <p style="
-            font-size:12px;
-            color:#666;
-            text-align:center;
-            margin-top:15px;
-        ">
-            Handbal WisselCoach v1.2<br>
-        </p>
+<h3>💡 Tip</h3>
 
-        <button
-            id="infoCloseBtn"
-            onclick="closeInfoModal()">
-            Sluiten
-        </button>
+<p>
+    Deze app is ontwikkeld als ondersteuning voor jeugdcoaches.
+    Gebruik de adviezen als hulpmiddel, maar houd altijd rekening
+    met de wedstrijdsituatie, ontwikkeling en het spelplezier van
+    de speelsters.
+</p>
 
-    </div>
+<hr>
+
+<p style="
+    font-size:12px;
+    color:#666;
+    text-align:center;
+    margin-top:15px;
+">
+    Handbal WisselCoach v1.2<br>
+    © 2026 Niels te Heemskerk
+</p>
+
+<button
+    id="infoCloseBtn"
+    onclick="closeInfoModal()">
+    Sluiten
+</button>
 
 </div>
+
+</div>
+
+<div
+id="positionEditor"
+class="hidden"
+style="
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+background:white;
+padding:20px;
+border-radius:12px;
+box-shadow:0 0 20px rgba(0,0,0,0.3);
+z-index:10000;
+width:280px;
+max-width:420px;
+max-height:80vh;
+overflow-y:auto;
+"
+>
+
+</div>
+
 <script>
 
 /*
@@ -1140,6 +1056,7 @@ let adviceCooldownUntil = 0;
 let matchArchive = [];
 let matchArchived = false;
 let alertTimeout = null;
+let editingPosition = null;
 
 /* ===================================================== */
 /* TEAMBEHEER */
@@ -1167,9 +1084,9 @@ function addPlayer(){
         return;
     }
 
-    if(players.length >= 10){
+    if(players.length >= 15){
 
-        alert("Maximaal 10 speelsters");
+        alert("Maximaal 15 speelsters");
 
         return;
     }
@@ -1190,7 +1107,7 @@ renderPlayers();
 saveTeam();
 }
 
-function saveTeam(){
+function saveTeam(showMessage = false){
 
 const teamName =
 document.getElementById("teamName")
@@ -1237,6 +1154,14 @@ document.getElementById(
     "selectedTeamName"
 ).innerText =
 "Team: " + teamName;
+
+if(showMessage){
+
+    showAlertBanner(
+        "✅ Team " + teamName + " opgeslagen"
+    );
+
+}
 
 }
 
@@ -1439,6 +1364,13 @@ delete benchCount[removedPlayer];
 delete keeperTime[removedPlayer];
 delete positionTimes[removedPlayer];
 
+currentAdvice =
+currentAdvice.filter(
+    advice =>
+    advice.incoming !== removedPlayer &&
+    advice.outgoing !== removedPlayer
+);
+
 Object.keys(currentLineup)
 .forEach(position => {
 
@@ -1456,7 +1388,6 @@ players.splice(index,1);
 renderPlayers();
 
 updateFieldDisplay();
-renderSubstitutionOptions();
 renderSubstitutionHistory();
 saveTeam();
 
@@ -1489,11 +1420,11 @@ onclick="removePlayer(${index})">
 /* WEDSTRIJDSTART */
 /* ===================================================== */
 
-function newMatch(){
+function resetMatch(){
 
     if(
         !confirm(
-            "Alle wedstrijdgegevens wissen en een nieuwe wedstrijd starten?"
+            "Wedstrijd resetten?\n\nHuidige wedstrijdgegevens gaan verloren."
         )
     ){
         return;
@@ -1552,7 +1483,6 @@ fairPlay.innerHTML =
 fairPlay.style.color = "green";
 
 updateFieldDisplay();
-renderSubstitutionOptions();
 renderPlayingTimes();
 renderSubstitutionHistory();
 renderSwitchCompass();
@@ -1562,7 +1492,10 @@ updateFairPlay();
 
 function startMatch(){
 
-if(Object.keys(currentLineup).length > 0){
+if(
+    Object.values(currentLineup)
+    .some(player => player)
+){
 
 document.getElementById("prepScreen").classList.add("hidden");
 
@@ -1595,6 +1528,7 @@ matchSeconds = 0;
 
 matchArchived = false;
 
+currentLineup = {};
 pauseTimer();
 
 document
@@ -1604,7 +1538,6 @@ document
 playTimes = {};
 benchCount = {};
 substitutionLog = [];
-currentLineup = {};
 keeperTime = {};
 positionTimes = {};
 
@@ -1654,14 +1587,14 @@ document.getElementById("prepScreen")
 document.getElementById("matchScreen")
 .classList.remove("hidden");
 
-showLineupSetup();
+scrollToTop();
+
+updateFieldDisplay();
 renderPlayingTimes();
 renderSwitchCompass();
-renderSubstitutionOptions();
 renderSubstitutionHistory();
 calculateSubAdvice();
 updateFairPlay();
-updateFieldDisplay();
 updateNextSwitchTimer();  
 
 
@@ -1680,7 +1613,7 @@ function goalHome(){
     .innerText =
     homeScore;
 
-    saveMatchState();
+    queueSave();
 }
 
 function goalAway(){
@@ -1692,7 +1625,7 @@ function goalAway(){
     .innerText =
     awayScore;
 
-    saveMatchState();
+    queueSave();
 }
 
 function undoHomeGoal(){
@@ -1706,7 +1639,7 @@ function undoHomeGoal(){
         .innerText =
         homeScore;
 
-        saveMatchState();
+        queueSave();
     }
 }
 
@@ -1721,17 +1654,11 @@ function undoAwayGoal(){
         .innerText =
         awayScore;
 
-        saveMatchState();
+        queueSave();
     }
 }
 
 function startTimer(){
-
-    document
-    .getElementById(
-        "keeperSwapCard"
-    )
-    .classList.add("hidden");
 
     if(matchSeconds < 1200){
 
@@ -1778,239 +1705,17 @@ function pauseTimer(){
 
 }
 
-function showLineupSetup(){
-
-    const availablePlayers =
-    players.filter(player =>
-        playerAvailable[player]
-    );
-
-    const positions = [
-        "lineupKeeper",
-        "lineupPivot",
-        "lineupLeftBack",
-        "lineupRightBack",
-        "lineupLeftCorner",
-        "lineupRightCorner"
-    ];
-
-    positions.forEach(id => {
-
-        let html = "";
-
-        availablePlayers.forEach(player => {
-
-    let currentRole = "";
-
-if(Object.keys(currentLineup).length > 0){
-
-    currentRole = "Bank";
-
-    Object.entries(currentLineup)
-    .forEach(([position,value]) => {
-
-        if(value === player){
-
-            const labels = {
-                keeper:"Keeper",
-                pivot:"CIR",
-                leftBack:"LO",
-                rightBack:"RO",
-                leftCorner:"LH",
-                rightCorner:"RH"
-            };
-
-            currentRole = labels[position];
-        }
-
-    });
-
-}
-
-const profile = [];
-
-if(playerHandedness[player] === "left"){
-    profile.push("Links");
-}
-
-if(playerKeepers[player]){
-    profile.push("KP");
-}
-
-const profileText =
-profile.length
-? " · " + profile.join(" · ")
-: "";
-
-const roleText =
-currentRole
-? ` (${currentRole})`
-: "";
-
-html += `
-<option value="${player}">
-    ${player}${profileText}${roleText}
-</option>`;
-
-}
-
-);
-
-        document.getElementById(id).innerHTML =
-        html;
-
-    });
-
-if(currentLineup.leftBack){
-
-    document.getElementById(
-        "lineupLeftBack"
-    ).value =
-    currentLineup.leftBack;
-
-}
-
-if(currentLineup.rightBack){
-
-    document.getElementById(
-        "lineupRightBack"
-    ).value =
-    currentLineup.rightBack;
-
-}
-
-if(currentLineup.pivot){
-
-    document.getElementById(
-        "lineupPivot"
-    ).value =
-    currentLineup.pivot;
-
-}
-
-if(currentLineup.leftCorner){
-
-    document.getElementById(
-        "lineupLeftCorner"
-    ).value =
-    currentLineup.leftCorner;
-
-}
-
-if(currentLineup.rightCorner){
-
-    document.getElementById(
-        "lineupRightCorner"
-    ).value =
-    currentLineup.rightCorner;
-
-}
-
-if(currentLineup.keeper){
-
-    document.getElementById(
-        "lineupKeeper"
-    ).value =
-    currentLineup.keeper;
-
-}
-
-    document
-    .getElementById("lineupCard")
-    .classList.remove("hidden");
-}
-
-function closeLineupSetup(){
-
-    document
-    .getElementById("lineupCard")
-    .classList.add("hidden");
-
-}
-
-function applyLineup(){
-
-    const lineup = {
-
-        keeper:
-        document.getElementById("lineupKeeper").value,
-
-        pivot:
-        document.getElementById("lineupPivot").value,
-
-        leftBack:
-        document.getElementById("lineupLeftBack").value,
-
-        rightBack:
-        document.getElementById("lineupRightBack").value,
-
-        leftCorner:
-        document.getElementById("lineupLeftCorner").value,
-
-        rightCorner:
-        document.getElementById("lineupRightCorner").value
-    };
-
-    const selected =
-    Object.values(lineup);
-
-    if(new Set(selected).size < 6){
-
-        alert(
-        "Iedere positie moet een andere speelster hebben"
-        );
-
-        return;
-    }
-
-    currentLineup = lineup;
-
-Object.values(currentLineup).forEach(player => {
-
-    if(!playTimes[player]){
-        playTimes[player] = 0;
-    }
-
-    if(!keeperTime[player]){
-        keeperTime[player] = 0;
-    }
-
-    if(!positionTimes[player]){
-
-        positionTimes[player] = {
-
-            keeper:0,
-            pivot:0,
-            leftBack:0,
-            rightBack:0,
-            leftCorner:0,
-            rightCorner:0
-
-        };
-
-    }
-
-});
-
-    updateFieldDisplay();
-    renderSubstitutionOptions();
-    renderSubstitutionHistory();
-    calculateSubAdvice();
-    updateFairPlay();
-
-    document
-    .getElementById("lineupCard")
-    .classList.add("hidden");
-
-    saveMatchState();
-}
 function showAlertBanner(message){
 
     const banner =
     document.getElementById("alertBanner");
 
-    banner.innerHTML = message;
+    if(!banner){
+        console.error("alertBanner niet gevonden");
+        return;
+    }
 
+    banner.innerHTML = message;
     banner.style.display = "block";
 
     clearTimeout(alertTimeout);
@@ -2019,9 +1724,9 @@ function showAlertBanner(message){
 
         banner.style.display = "none";
 
-    },10000);
-}
+    }, 5000);
 
+}
 function updateTimer(){
 
 const minutes =
@@ -2054,8 +1759,6 @@ if(matchSeconds === 600){
         "matchPhase"
     ).innerText = "Time-Out";
 
-    showKeeperSwapCard();
-
     showAlertBanner(
         "⏰ Time-Out"
     );
@@ -2086,9 +1789,7 @@ document.getElementById(
     "matchPhase"
 ).innerText = "Time-Out";
 
-    showKeeperSwapCard();
-
-    showAlertBanner(
+showAlertBanner(
         "⏰ Time-Out"
     );
 
@@ -2281,8 +1982,8 @@ Math.max(...values, 0);
     	const seconds =
 	getTotalPlayTime(player);
 
-        const minutes =
-        Math.floor(seconds / 60);
+const minutes =
+Math.floor(seconds / 60);
 
         let color = "#4caf50";
 
@@ -2350,12 +2051,13 @@ font-size:14px;
 margin-bottom:6px;
 ">
 
-    <span>${player}</span>
+<span>${player}</span>
 
-    <span>${minutes}m</span>
+<span>
+    ${minutes} min
+</span>
 
-    <span>
-        ${currentPositionText}
+<span>${currentPositionText}
 
         <span style="
             font-size:11px;
@@ -2427,50 +2129,6 @@ function renderSwitchCompass(){
     .innerHTML = html;
 }
 
-function renderSubstitutionOptions(){
-
-const availablePlayers =
-players.filter(
-player =>
-    playerAvailable[player] &&
-    !Object.values(currentLineup).includes(player)
-);
-
-if(availablePlayers.length === 0){
-
-    document.getElementById("subIn").innerHTML =
-    "<option>Geen bankspelers beschikbaar</option>";
-
-    return;
-}
-
-let html = "";
-
-availablePlayers.forEach(player => {
-
-const profile = [];
-
-if(playerHandedness[player] === "left"){
-    profile.push("Links");
-}
-
-if(playerKeepers[player]){
-    profile.push("KP");
-}
-
-html += `
-<option value="${player}">
-    ${player}
-    ${profile.length ? " (" + profile.join(", ") + ")" : ""}
-</option>
-`;
-});
-
-    document
-    .getElementById("subIn")
-    .innerHTML = html;
-}
-
 function renderSubstitutionHistory(){
 
     if(substitutionLog.length === 0){
@@ -2518,6 +2176,19 @@ function renderSubstitutionHistory(){
 /* HULPFUNCTIES */
 /* ===================================================== */
 
+function scrollToTop(){
+
+    setTimeout(() => {
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+
+    }, 50);
+
+}
+
 function getPositionLabel(position){
 
     const labels = {
@@ -2539,114 +2210,10 @@ function getPositionLabel(position){
 /* OPSTELLING & WISSELS */
 /* ===================================================== */
 
-function makeSubstitution(){
-
-    const incoming =
-    document
-    .getElementById("subIn")
-    .value;
-
-    const position =
-    document
-    .getElementById("subPosition")
-    .value;
-
-    if(!incoming){
-        return;
-    }
-
-const outgoing =
-currentLineup[position];
-
-// staat deze speelster al ergens op het veld?
-const previousPosition =
-Object.keys(currentLineup).find(
-    pos => currentLineup[pos] === incoming
-);
-
-if(previousPosition){
-
-    alert(
-        incoming +
-        " staat al in het veld."
-    );
-
-    return;
-}
-
-currentLineup[position] = incoming;
-
-if(!playTimes[incoming]){
-    playTimes[incoming] = 0;
-}
-
-if(!keeperTime[incoming]){
-    keeperTime[incoming] = 0;
-}
-
-if(!positionTimes[incoming]){
-
-    positionTimes[incoming] = {
-
-        keeper:0,
-        pivot:0,
-        leftBack:0,
-        rightBack:0,
-        leftCorner:0,
-        rightCorner:0
-
-    };
-
-}
-
-if(outgoing){
-
-    benchCount[outgoing] =
-    (benchCount[outgoing] || 0) + 1;
-
-}
-
-    updateFieldDisplay();
-
-    renderSubstitutionOptions();
-
-    const minute =
-    String(Math.floor(matchSeconds/60))
-    .padStart(2,"0");
-
-substitutionLog.unshift({
-
-    minute: minute + "'",
-
-    position: getPositionLabel(position),
-
-    incoming: incoming,
-
-    outgoing: outgoing
-
-});
-
-currentAdvice =
-currentAdvice.filter(advice =>
-    !(
-        advice.incoming === incoming &&
-        advice.outgoing === outgoing
-    )
-);
-
-if(currentAdvice.length === 0){
-
-    adviceCooldownUntil =
-    matchSeconds + 120;
-
-}
-
-renderSubstitutionHistory();
-calculateSubAdvice();
-saveMatchState();
-}
-
 function updateFieldDisplay(){
+
+const emptyIcon =
+'<span style="color:#b0bec5;font-size:18px;">⊕</span>';
 
     // Nog geen opstelling ingevuld
 
@@ -2666,34 +2233,38 @@ if(Object.keys(currentLineup).length === 0){
 }
 
     // Veldposities tonen
-    document.getElementById("mKeeper").innerText =
-    currentLineup.keeper || "⚠️ Open";
 
-    document.getElementById("mPivot").innerText =
-    currentLineup.pivot || "⚠️ Open";
+document.getElementById("mKeeper").innerHTML =
+currentLineup.keeper || emptyIcon;
 
-    document.getElementById("mLO").innerText =
-    currentLineup.leftBack || "⚠️ Open";
+document.getElementById("mPivot").innerHTML =
+currentLineup.pivot || emptyIcon;
 
-    document.getElementById("mRO").innerText =
-    currentLineup.rightBack || "⚠️ Open";
+document.getElementById("mLO").innerHTML =
+currentLineup.leftBack || emptyIcon;
 
-    document.getElementById("mLH").innerText =
-    currentLineup.leftCorner || "⚠️ Open";
+document.getElementById("mRO").innerHTML =
+currentLineup.rightBack || emptyIcon;
 
-    document.getElementById("mRH").innerText =
-    currentLineup.rightCorner || "⚠️ Open";
+document.getElementById("mLH").innerHTML =
+currentLineup.leftCorner || emptyIcon;
+
+document.getElementById("mRH").innerHTML =
+currentLineup.rightCorner || emptyIcon;
 
     // Bankspelers bepalen
-    const fieldPlayers =
-    Object.values(currentLineup);
 
-    const benchPlayers =
-    players.filter(
-        player =>
-        playerAvailable[player] &&
-        !fieldPlayers.includes(player)
-    );
+const fieldPlayers =
+Object.values(currentLineup)
+.filter(Boolean);
+
+const benchPlayers =
+players.filter(
+player =>
+playerAvailable[player] &&
+!fieldPlayers.includes(player)
+    
+);
 
     document
     .getElementById("benchPlayers")
@@ -2711,273 +2282,244 @@ if(Object.keys(currentLineup).length === 0){
 
     : "Geen bankspelers";
 
-    // Controle of alle 6 posities gevuld zijn
-    const activeCount =
-    Object.values(currentLineup)
-    .filter(Boolean)
-    .length;
-
-    if(activeCount < 6){
-
-        const labels = {
-            keeper: "Keeper",
-            pivot: "Cirkellijn",
-            leftBack: "Linkeropbouw",
-            rightBack: "Rechteropbouw",
-            leftCorner: "Linkerhoek",
-            rightCorner: "Rechterhoek"
-        };
-
-        const openPositions = [];
-
-        Object.entries(currentLineup)
-        .forEach(([position, player]) => {
-
-            if(!player){
-
-                openPositions.push(
-                    labels[position]
-                );
-
-            }
-
-        });
-
-showAlertBanner(
-    "⚙️ Open posities: " +
-    openPositions.join(", ")
-);
-
-}
-
 }
 
 function calculateSubAdvice(){
 
     if(matchSeconds < 60){
 
-        document
-        .getElementById("subAdvice")
-        .innerHTML =
+        document.getElementById("subAdvice").innerHTML =
         "Wisseladvies beschikbaar vanaf 1 minuut speeltijd";
 
         return;
     }
 
-if(adviceCooldownUntil > matchSeconds){
+    if(adviceCooldownUntil > matchSeconds){
 
-    const remaining =
-    adviceCooldownUntil - matchSeconds;
+        const remaining =
+        adviceCooldownUntil - matchSeconds;
 
-    const minutes =
-    Math.floor(remaining / 60);
+        const minutes =
+        Math.floor(remaining / 60);
 
-    const seconds =
-    String(remaining % 60)
-    .padStart(2,"0");
+        const seconds =
+        String(remaining % 60)
+        .padStart(2,"0");
 
-    document
-    .getElementById("subAdvice")
-    .innerHTML = `
-        <div style="
-            color:#1565c0;
-            font-weight:bold;
-            margin-bottom:8px;
-        ">
-            ⏳ Recente wissel(s) uitgevoerd
-        </div>
+        document.getElementById("subAdvice").innerHTML = `
+            <div style="
+                color:#1565c0;
+                font-weight:bold;
+                margin-bottom:8px;
+            ">
+                ⏳ Recente wissel(s) uitgevoerd
+            </div>
 
-        <div>
-            Volgend advies over
-            ${minutes}:${seconds}
-        </div>
-    `;
+            <div>
+                Volgend advies over
+                ${minutes}:${seconds}
+            </div>
+        `;
 
-    return;
-}
-
-const availableCount =
-players.filter(
-    player => playerAvailable[player]
-).length;
-
-let adviceCount = 1;
-
-if(availableCount === 10){
-    adviceCount = 2;
-}
-else if(availableCount === 9){
-    adviceCount = 3;
-}
-else if(availableCount === 8){
-    adviceCount = 2;
-}
+        return;
+    }
 
     const activePlayers =
     Object.values(currentLineup)
     .filter(Boolean);
 
-    const fieldPlayers =
-    activePlayers.filter(
-        player => player !== currentLineup.keeper
-    );
-
     const benchPlayers =
     players.filter(
         player =>
-            playerAvailable[player] &&
-            !activePlayers.includes(player)
+        playerAvailable[player] &&
+        !activePlayers.includes(player)
     );
-
-    if(fieldPlayers.length === 0){
-
-        document
-        .getElementById("subAdvice")
-        .innerHTML =
-        "Geen veldspeelsters beschikbaar";
-
-        return;
-    }
 
     if(benchPlayers.length === 0){
 
-        document
-        .getElementById("subAdvice")
-        .innerHTML =
-        "Geen bankspelers beschikbaar voor wisseladvies";
+        document.getElementById("subAdvice").innerHTML =
+        "Geen bankspelers beschikbaar";
 
         return;
     }
 
-const allTimes =
-players
-.filter(player => playerAvailable[player])
-.map(player => getTotalPlayTime(player));
+    const availablePlayers =
+    players.filter(
+        player => playerAvailable[player]
+    );
 
-const maxTime =
-Math.max(...allTimes);
+    const allTimes =
+    availablePlayers.map(
+        player => getTotalPlayTime(player)
+    );
 
-const minTime =
-Math.min(...allTimes);
+    const maxTime =
+    Math.max(...allTimes);
 
-const difference =
-maxTime - minTime;
+    const minTime =
+    Math.min(...allTimes);
 
-if(difference < 90){
+    const difference =
+    maxTime - minTime;
 
-    document
-    .getElementById("subAdvice")
-    .innerHTML = `
+    if(difference < 90){
+
+        document.getElementById("subAdvice").innerHTML = `
+            <div style="
+                color:#2e7d32;
+                font-weight:bold;
+                margin-bottom:10px;
+            ">
+                ✅ Speeltijden zijn goed in balans
+            </div>
+
+            Geen wisseladvies nodig.
+        `;
+
+        return;
+    }
+
+    const sortedFieldPlayers =
+    activePlayers
+    .slice()
+    .sort(
+        (a,b) =>
+        getTotalPlayTime(b) -
+        getTotalPlayTime(a)
+    );
+
+    const sortedBenchPlayers =
+    benchPlayers
+    .slice()
+    .sort(
+        (a,b) =>
+        getTotalPlayTime(a) -
+        getTotalPlayTime(b)
+    );
+
+    let adviceCount = 1;
+
+    const availableCount =
+    availablePlayers.length;
+
+    if(availableCount === 8){
+        adviceCount = 2;
+    }
+
+    if(availableCount === 9){
+        adviceCount = 3;
+    }
+
+    if(availableCount >= 10){
+        adviceCount = 2;
+    }
+
+    currentAdvice = [];
+
+    let adviceHtml = `
+    <b>Geadviseerde wissels</b>
+    <br><br>
+    `;
+
+    for(
+        let i = 0;
+        i < Math.min(
+            adviceCount,
+            sortedFieldPlayers.length,
+            sortedBenchPlayers.length
+        );
+        i++
+    ){
+
+const outgoing =
+sortedFieldPlayers[i];
+
+const incoming =
+sortedBenchPlayers[i];
+
+const playGap =
+getTotalPlayTime(outgoing) -
+getTotalPlayTime(incoming);
+
+if(playGap < 120){
+    continue;
+}
+
+        const position =
+        Object.keys(currentLineup)
+        .find(
+            pos =>
+            currentLineup[pos] === outgoing
+        );
+
+        currentAdvice.push({
+            incoming,
+            outgoing,
+            position
+        });
+
+        adviceHtml += `
+        <div style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:10px;
+            padding:8px;
+            background:#f7f9fc;
+            border-radius:8px;
+        ">
+
+            <div>
+                ${incoming}
+                → voor
+                ${outgoing}
+                (${getPositionLabel(position)})
+                <br>
+                <small style="color:#666;">
+                    ${Math.floor(getTotalPlayTime(incoming)/60)} min
+                    ↔
+                    ${Math.floor(getTotalPlayTime(outgoing)/60)} min
+                </small>
+            </div>
+
+<button
+style="
+    width:auto;
+    min-width:50px;
+    padding:6px 10px;
+"
+onclick="
+    editingPosition='${position}';
+    selectPlayerForPosition('${incoming}');
+"
+>
+✓
+</button>
+
+</div>
+
+`;
+
+}
+
+if(currentAdvice.length === 0){
+
+    document.getElementById("subAdvice").innerHTML = `
         <div style="
             color:#2e7d32;
             font-weight:bold;
-            margin-bottom:10px;
         ">
-            ✅ Speeltijden zijn goed in balans
+            ✅ Geen nuttige wisseladviezen beschikbaar
         </div>
-
-        Geen wisseladvies nodig op basis van speeltijd.
     `;
 
     return;
 }
 
-const sortedFieldPlayers =
-fieldPlayers
-.slice()
-.sort(
-    (a,b) =>
-    getTotalPlayTime(b) -
-    getTotalPlayTime(a)
-);
-
-const sortedBenchPlayers =
-benchPlayers
-.slice()
-.sort(
-    (a,b) =>
-    getTotalPlayTime(a) -
-    getTotalPlayTime(b)
-);
-
-currentAdvice = [];
-
-let adviceHtml = `
-<b>Geadviseerde wissels</b>
-<br><br>
-`;
-
-for(
-    let i = 0;
-    i < Math.min(
-        adviceCount,
-        sortedFieldPlayers.length,
-        sortedBenchPlayers.length
-    );
-    i++
-){
-
-    const outgoing =
-    sortedFieldPlayers[i];
-
-    const incoming =
-    sortedBenchPlayers[i];
-
-    const position =
-    Object.keys(currentLineup)
-    .find(
-        pos =>
-        currentLineup[pos] === outgoing
-    );
-
-currentAdvice.push({
-    incoming,
-    outgoing,
-    position
-});
-
-    adviceHtml += `
-    <div style="
-        display:flex;
-        justify-content:space-between;
-        align-items:center;
-        margin-bottom:10px;
-        padding:8px;
-        background:#f7f9fc;
-        border-radius:8px;
-    ">
-
-        <div>
-            ${incoming}
-            → voor
-            ${outgoing}
-            (${getPositionLabel(position)})
-        </div>
-
-        <button
-        style="
-            width:auto;
-            min-width:50px;
-            padding:6px 10px;
-        "
-        onclick="
-            document.getElementById('subIn').value='${incoming}';
-            document.getElementById('subPosition').value='${position}';
-            makeSubstitution();
-        ">
-            ✓
-        </button>
-
-    </div>
-    `;
-}
-
-document
-.getElementById("subAdvice").innerHTML =
+document.getElementById("subAdvice").innerHTML =
 adviceHtml;
-}
 
-function updateFairPlay(){
+}function updateFairPlay(){
 
 const times =
 players
@@ -3003,7 +2545,8 @@ if(times.length < 2){
     Math.min(...times);
 
 const diffSeconds = max - min;
-const diffMinutes = (diffSeconds / 60).toFixed(1);
+const diffMinutes =
+Math.round(diffSeconds / 60);
 
     const status =
     document.getElementById(
@@ -3185,6 +2728,8 @@ function showArchive(){
     .getElementById("archiveScreen")
     .classList.remove("hidden");
 
+scrollToTop();
+
 }
 
 function closeArchive(){
@@ -3196,6 +2741,8 @@ function closeArchive(){
     document
     .getElementById("prepScreen")
     .classList.remove("hidden");
+
+scrollToTop();
 
 }
 
@@ -3820,6 +3367,19 @@ saveArchive();
 
 }
 
+let saveTimeout = null;
+
+function queueSave(){
+
+    clearTimeout(saveTimeout);
+
+    saveTimeout = setTimeout(
+        saveMatchState,
+        500
+    );
+
+}
+
 function saveMatchState(){
 
     const state = {
@@ -3931,11 +3491,9 @@ renderSwitchCompass();
 updateTimer();
 updateFieldDisplay();
 renderSubstitutionHistory();
-renderSubstitutionOptions();
 renderPlayingTimes();
 calculateSubAdvice();
 updateFairPlay();
-saveMatchState();
 updateNextSwitchTimer();
 
 if(
@@ -3979,46 +3537,61 @@ function downloadMatchReport(){
     .filter(player => playerAvailable[player])
     .forEach(player => {
 
-const minutes =
-Math.floor(
-    getTotalPlayTime(player) / 60
-);
-let positions = [];
-
-const labels = {
-    keeper:"KP",
-    pivot:"CIR",
-    leftBack:"LO",
-    rightBack:"RO",
-    leftCorner:"LH",
-    rightCorner:"RH"
-};
-
-Object.entries(positionTimes[player] || {})
-.forEach(([position,time]) => {
-
-    if(time > 0){
-
-        positions.push(
-            labels[position] +
-            " (" +
-            Math.floor(time / 60) +
-            "m)"
+        const minutes =
+        Math.floor(
+            getTotalPlayTime(player) / 60
         );
 
-    }
+        const keeperMinutes =
+        Math.floor(
+            getKeeperTime(player) / 60
+        );
 
-});
+        let positions = [];
 
-playTimesHtml += `
-<tr>
-    <td>${player}</td>
-    <td>${minutes} min</td>
-    <td>${positions.join(", ")}</td>
-</tr>
-`;
+        const labels = {
+            keeper:"KP",
+            pivot:"CIR",
+            leftBack:"LO",
+            rightBack:"RO",
+            leftCorner:"LH",
+            rightCorner:"RH"
+        };
 
-});
+        Object.entries(positionTimes[player] || {})
+        .forEach(([position,time]) => {
+
+            if(time > 0){
+
+                positions.push(
+                    labels[position] +
+                    " (" +
+                    Math.floor(time / 60) +
+                    "m)"
+                );
+
+            }
+
+        });
+
+        playTimesHtml += `
+        <tr>
+            <td>${player}</td>
+
+            <td>
+                ${minutes} min
+                ${
+                    keeperMinutes > 0
+                    ? `<br><small>🥅 ${keeperMinutes} min keeper</small>`
+                    : ""
+                }
+            </td>
+
+            <td>${positions.join(", ")}</td>
+        </tr>
+        `;
+
+    });
 
     let substitutionsHtml = "";
 
@@ -4043,36 +3616,36 @@ playTimesHtml += `
         `<tr><td colspan="4">Geen wissels</td></tr>`;
     }
 
-const allTimes =
-players
-.filter(player => playerAvailable[player])
-.map(player => getTotalPlayTime(player));
+    const allTimes =
+    players
+    .filter(player => playerAvailable[player])
+    .map(player => getTotalPlayTime(player));
 
-const maxPlay =
-allTimes.length
-? Math.max(...allTimes)
-: 0;
+    const maxPlay =
+    allTimes.length
+    ? Math.max(...allTimes)
+    : 0;
 
-const minPlay =
-allTimes.length
-? Math.min(...allTimes)
-: 0;
+    const minPlay =
+    allTimes.length
+    ? Math.min(...allTimes)
+    : 0;
 
-const fairPlayDiff =
-Math.floor((maxPlay - minPlay) / 60);
+    const fairPlayDiff =
+    Math.floor((maxPlay - minPlay) / 60);
 
-let fairPlayLabel = "🟢 Goed";
+    let fairPlayLabel = "🟢 Goed";
 
-if(fairPlayDiff >= 10){
+    if(fairPlayDiff >= 10){
 
-    fairPlayLabel = "🔴 Groot verschil";
+        fairPlayLabel = "🔴 Groot verschil";
 
-}
-else if(fairPlayDiff >= 5){
+    }
+    else if(fairPlayDiff >= 5){
 
-    fairPlayLabel = "🟠 Let op";
+        fairPlayLabel = "🟠 Let op";
 
-}
+    }
 
     const report = `
 <!DOCTYPE html>
@@ -4205,206 +3778,33 @@ ${fairPlayDiff} min
     link.href =
     URL.createObjectURL(blob);
 
-const safeHome =
-homeTeam.replace(/\s+/g,"_");
+    const safeHome =
+    homeTeam.replace(/\s+/g,"_");
 
-const safeAway =
-awayTeam.replace(/\s+/g,"_");
+    const safeAway =
+    awayTeam.replace(/\s+/g,"_");
 
-link.download =
-`Wedstrijdrapport_${safeHome}_${safeAway}.html`;
+    link.download =
+    `Wedstrijdrapport_${safeHome}_${safeAway}.html`;
 
     link.click();
 
     URL.revokeObjectURL(link.href);
 }
 
-function showKeeperSwapCard(){
-
-    const currentKeeper =
-    currentLineup.keeper;
-
-    if(!currentKeeper){
-        return;
-    }
-
-const keepers =
-players.filter(
-    player =>
-    playerKeepers[player] &&
-    playerAvailable[player]
-);
-
-const availableKeepers =
-keepers.filter(
-    player => player !== currentKeeper
-);
-
-    if(availableKeepers.length === 0){
-
-        document
-        .getElementById(
-            "keeperSwapCard"
-        )
-        .classList.remove("hidden");
-
-        document
-        .getElementById(
-            "currentKeeperDisplay"
-        )
-        .innerHTML =
-        "Huidige keeper: " + currentKeeper;
-
-        document
-        .getElementById(
-            "newKeeperSelect"
-        )
-        .innerHTML =
-        "<option>Geen andere keeper beschikbaar</option>";
-
-        return;
-    }
-
-    document
-    .getElementById(
-        "currentKeeperDisplay"
-    )
-    .innerHTML =
-    "Huidige keeper: " + currentKeeper;
-
-    document
-    .getElementById(
-        "newKeeperSelect"
-    )
-    .innerHTML =
-
-    availableKeepers.map(player =>
-
-        `<option value="${player}">
-            ${player}
-        </option>`
-
-    ).join("");
-
-    document
-    .getElementById(
-        "keeperSwapResult"
-    )
-    .innerHTML = "";
-
-    document
-    .getElementById(
-        "keeperSwapCard"
-    )
-    .classList.remove("hidden");
-}
-
-function performKeeperSwap(){
-
-    const oldKeeper =
-    currentLineup.keeper;
-
-    const newKeeper =
-    document.getElementById(
-        "newKeeperSelect"
-    ).value;
-
-    if(
-        !newKeeper ||
-        newKeeper === oldKeeper
-    ){
-        return;
-    }
-
-const fieldPosition =
-Object.keys(currentLineup).find(
-    pos =>
-    pos !== "keeper" &&
-    currentLineup[pos] === newKeeper
-);
-
-if(fieldPosition){
-
-    currentLineup[fieldPosition] = "";
-
-    showAlertBanner(
-        "⚠️ Vergeet geen nieuwe speelster op " +
-        getPositionLabel(fieldPosition) +
-        " te plaatsen."
-    );
-
-}
-
-currentLineup.keeper = newKeeper;
-
-updateFieldDisplay();
-
-    substitutionLog.unshift({
-
-        minute:
-        String(
-            Math.floor(
-                matchSeconds / 60
-            )
-        ) + "'",
-
-        position:"Keeper",
-
-        incoming:newKeeper,
-
-        outgoing:oldKeeper
-
-    });
-
-renderSubstitutionHistory();
-renderSubstitutionOptions();
-calculateSubAdvice();
-updateFairPlay();
-
-    document
-    .getElementById(
-        "currentKeeperDisplay"
-    )
-    .innerHTML =
-    "Huidige keeper: " + newKeeper;
-
-    document
-    .getElementById(
-        "keeperSwapResult"
-    )
-    .innerHTML =
-
-    "✅ Keeper gewisseld: " +
-    oldKeeper +
-    " → " +
-    newKeeper;
-
-    saveMatchState();
-
-}
-
 function backToSetup(){
 
-document
-.getElementById("keeperSwapCard")
-.classList.add("hidden");
+    document
+    .getElementById("matchScreen")
+    .classList.add("hidden");
 
-const lineupCard =
-document.getElementById("lineupCard");
+    document
+    .getElementById("prepScreen")
+    .classList.remove("hidden");
 
-if(lineupCard){
-    lineupCard.classList.add("hidden");
-}
+scrollToTop();
 
-document
-.getElementById("matchScreen")
-.classList.add("hidden");
-
-document
-.getElementById("prepScreen")
-.classList.remove("hidden");
-
-saveMatchState();
+queueSave();
 
 }
 
@@ -4429,6 +3829,203 @@ function closeInfoModal(){
     document.getElementById(
         "infoModal"
     ).style.display = "none";
+
+}
+
+function editPosition(position){
+
+    editingPosition = position;
+
+    const currentPlayer =
+    currentLineup[position] || "";
+
+    let html =
+    `<div style="margin-bottom:15px;">
+        <strong>${getPositionLabel(position)}</strong>
+    </div>`;
+
+
+if(currentPlayer){
+
+html += `
+<div style="
+margin-bottom:12px;
+color:#1565c0;
+font-weight:bold;
+">
+✅ ${currentPlayer} (huidig)
+</div>`;
+}
+
+const benchPlayers =
+players.filter(player =>
+    playerAvailable[player] &&
+    !Object.values(currentLineup).includes(player)
+);
+
+const fieldPlayers =
+players.filter(player =>
+    playerAvailable[player] &&
+    Object.values(currentLineup).includes(player) &&
+    player !== currentPlayer
+);
+
+html += `
+<h3 style="
+color:#43a047;
+margin:15px 0 10px 0;
+">
+🟢 Bankspelers
+</h3>
+`;
+
+benchPlayers.forEach(player => {
+
+    html += `
+    <button
+        style="
+            margin-bottom:8px;
+            width:100%;
+            text-align:left;
+
+            background:#e8f5e9;
+            color:#2e7d32;
+            border:1px solid #81c784;
+        "
+        onclick="selectPlayerForPosition('${player}')"
+    >
+        ${player}
+${playerKeepers[player] ? " • KP" : ""}
+${playerHandedness[player] === "left" ? " • Links" : ""}
+    </button>`;
+});
+
+html += `
+<h3 style="
+color:#1565c0;
+margin:15px 0 10px 0;
+">
+🔵 Veldspelers
+</h3>
+`;
+
+fieldPlayers.forEach(player => {
+
+    const playerPosition =
+    Object.keys(currentLineup).find(
+        pos => currentLineup[pos] === player
+    );
+
+    const labels = {
+        keeper:"KP",
+        pivot:"CIR",
+        leftBack:"LO",
+        rightBack:"RO",
+        leftCorner:"LH",
+        rightCorner:"RH"
+    };
+
+    html += `
+    <button
+        style="
+            margin-bottom:8px;
+            width:100%;
+            text-align:left;
+
+            background:#e3f2fd;
+            color:#1565c0;
+            border:1px solid #64b5f6;
+        "
+        onclick="selectPlayerForPosition('${player}')"
+    >
+        ${player}
+${playerKeepers[player] ? " • KP" : ""}
+${playerHandedness[player] === "left" ? " • Links" : ""}
+• ${labels[playerPosition]}
+
+    </button>`;
+});
+
+    html += `
+    <button
+        onclick="closePositionEditor()"
+        style="
+            background:#757575;
+            margin-top:10px;
+        "
+    >
+        Sluiten
+    </button>`;
+
+    document.getElementById("positionEditor").innerHTML =
+    html;
+
+    document
+        .getElementById("positionEditor")
+        .classList.remove("hidden");
+}
+
+function closePositionEditor(){
+
+    document.getElementById("positionEditor")
+    .classList.add("hidden");
+
+    editingPosition = null;
+}
+
+function selectPlayerForPosition(player){
+
+    const existingPosition =
+    Object.keys(currentLineup).find(
+        pos => currentLineup[pos] === player
+    );
+
+const outgoing =
+currentLineup[editingPosition] || "";
+
+    if(
+        existingPosition &&
+        existingPosition !== editingPosition
+    ){
+        currentLineup[existingPosition] = "";
+    }
+
+    currentLineup[editingPosition] = player;
+
+if(outgoing && outgoing !== player){
+
+    substitutionLog.unshift({
+
+        minute:
+        String(
+            Math.floor(matchSeconds/60)
+        ).padStart(2,"0") + "'",
+
+        position:
+        getPositionLabel(editingPosition),
+
+        incoming: player,
+        outgoing: outgoing
+
+    });
+
+    renderSubstitutionHistory();
+}
+
+currentAdvice =
+currentAdvice.filter(
+    advice =>
+    !(
+        advice.incoming === player &&
+        advice.position === editingPosition
+    )
+);
+
+updateFieldDisplay();
+calculateSubAdvice();
+updateFairPlay();
+queueSave();
+closePositionEditor();
 
 }
 

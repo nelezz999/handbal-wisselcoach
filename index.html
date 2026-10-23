@@ -1,5 +1,5 @@
 <!--
-Handbal WisselCoach v1.2
+Handbal WisselCoach v1.3
 © 2026 Niels te Heemskerk
 Alle rechten voorbehouden.
 Ongeoorloofde reproductie of verspreiding is verboden.
@@ -64,6 +64,26 @@ button{
     cursor:pointer;
 }
 
+.button-feedback{
+    animation:buttonPress 0.15s ease;
+}
+
+@keyframes buttonPress{
+
+    0%{
+        transform:scale(1);
+    }
+
+    50%{
+        transform:scale(0.92);
+    }
+
+    100%{
+        transform:scale(1);
+    }
+
+}
+
 input[type=text],
 select{
     width:100%;
@@ -83,6 +103,7 @@ select{
 .field{
     text-align:center;
 }
+
 .field-layout{
     display:flex;
     flex-direction:column;
@@ -95,17 +116,43 @@ select{
     gap:8px;
 }
 
+.field-position{
+    background:#ffffff;
+    border:1px solid #cfd8e3;
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:0 2px 4px rgba(0,0,0,0.04);
+}
+
 .field-label{
-    font-size:12px;
-    font-weight:bold;
-    color:#002B5C;
-    margin-bottom:6px;
+    background:#f4f7fb;
+    color:#455a64;
+    font-size:15px;
+    font-weight:700;
+    letter-spacing:0.5px;
+    padding:8px 0;
+    border-bottom:1px solid #dde5ee;
+    text-align:center;
 }
 
 .field-player{
-    font-size:14px;
-    font-weight:bold;
-    word-break:break-word;
+    background:#ffffff;
+    color:#263238;
+    font-size:17px;
+    font-weight:700;
+
+    min-height:55px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    padding:14px 6px;
+    text-align:center;
+}
+
+.field-position:hover{
+    background:#dde6f2;
 }
 
 .empty-position{
@@ -121,8 +168,7 @@ select{
 
 .keeper-position{
     width:140px;
-    background:#e3f2fd;
-    border:2px solid #90caf9;
+    border:2px solid #7bb6f0;
 }
 
 #benchPlayers{
@@ -131,6 +177,7 @@ select{
     gap:8px;
     margin-top:10px;
 }
+
 .player-line{
     display:flex;
     justify-content:space-between;
@@ -164,9 +211,9 @@ select{
 
 .profile-card{
     background:#eef2f7;
-    padding:10px;
+    padding:8px;
     border-radius:8px;
-    margin-bottom:10px;
+    margin-bottom:8px;
 }
 
 .profile-card select{
@@ -233,22 +280,6 @@ select{
 #switchCompass{
     font-size:14px;
     line-height:1.5;
-}
-
-.field-position{
-    background:#eef2f7;
-    border-radius:10px;
-    padding:10px 4px;
-    text-align:center;
-    min-height:78px;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    cursor:pointer;
-}
-
-.field-position:hover{
-    background:#dde6f2;
 }
 
 .timer-box{
@@ -457,18 +488,22 @@ onchange="loadSelectedTeam()">
     id="teamName"
     placeholder="Bijv. D1">
 
-<button onclick="saveTeam(true)">
+<button
+id="saveTeamBtn"
+onclick="buttonFeedback('saveTeamBtn'); saveTeam(true);">
     Team opslaan
 </button>
 
 <button
-onclick="showArchive()"
+id="archiveBtn"
+onclick="buttonFeedback('archiveBtn'); showArchive();"
 style="background:#1565c0;margin-top:8px;">
 📁 Wedstrijdarchief
 </button>
 
 <button
-onclick="deleteTeam()"
+id="deleteTeamBtn"
+onclick="buttonFeedback('deleteTeamBtn'); deleteTeam();"
 style="background:#c62828; margin-top:8px;">
     Team verwijderen
 </button>
@@ -500,7 +535,8 @@ placeholder="Naam speelster"
 style="margin-bottom:12px;">
 
 <button
-onclick="addPlayer()"
+id="addPlayerBtn"
+onclick="buttonFeedback('addPlayerBtn'); addPlayer();"
 style="margin-bottom:12px;">
 Speelster toevoegen
 </button>
@@ -555,12 +591,15 @@ Nog geen speelsters
 
 </div>
 
-<button id="startMatchBtn" onclick="startMatch()">
+<button
+id="startMatchBtn"
+onclick="buttonFeedback('startMatchBtn'); startMatch()">
 Wedstrijd openen
 </button>
 
 <button
-onclick="resetMatch()"
+id="resetMatchBtn"
+onclick="buttonFeedback('resetMatchBtn'); resetMatch()"
 style="
 background:#1565c0;
 margin-top:8px;
@@ -569,7 +608,7 @@ Wedstrijd resetten
 </button>
 
 <div class="watermark">
-    Handbal WisselCoach v1.2 • © 2026 Niels te Heemskerk
+    Handbal WisselCoach v1.3 • © 2026 Niels te Heemskerk
 </div>
 
 </div>
@@ -614,70 +653,68 @@ class="container hidden">
 
         <div class="score-buttons">
 
-            <button
-            class="score-btn"
-            onclick="goalHome()">
-                +
-            </button>
-
-            <button
-            class="score-btn"
-            style="background:#c62828;"
-            onclick="undoHomeGoal()">
-                −
-            </button>
-
-
-        </div>
-
-    </div>
-
-    <div class="score-row">
-
-        <span>
-            <span id="awayTeamLabel">Uit</span>
-        </span>
-
-        <span class="team-score">
-            <span id="awayScore">0</span>
-        </span>
-
-        <div class="score-buttons">
+<button
+id="homePlusBtn"
+class="score-btn"
+onclick="goalHome()">
+    +
+</button>
 
 <button
+id="homeMinusBtn"
+class="score-btn"
+style="background:#c62828;"
+onclick="undoHomeGoal()">
+    −
+</button>
+
+</div>
+
+</div>
+
+<div class="score-row">
+
+<span>
+<span id="awayTeamLabel">Uit</span>
+</span>
+
+<span class="team-score">
+<span id="awayScore">0</span>
+</span>
+
+<div class="score-buttons">
+
+<button
+id="awayPlusBtn"
 class="score-btn"
 onclick="goalAway()">
     +
 </button>
 
 <button
+id="awayMinusBtn"
 class="score-btn"
 style="background:#c62828;"
 onclick="undoAwayGoal()">
     −
 </button>
 
-        </div>
+</div>
 
-    </div>
+</div>
 
-    <hr>
+<hr>
 
-    <div class="control-row">
+<div class="control-row">
 
-        <button
-        class="control-btn"
-        onclick="startTimer()">
-            ▶ Start
-        </button>
+    <button
+    id="timerToggleBtn"
+    class="control-btn"
+    onclick="toggleTimer()">
+        ▶ Start
+    </button>
 
-        <button
-        class="control-btn"
-        onclick="pauseTimer()">
-            ⏸ Pauze
-        </button>
-
-    </div>
+</div>
 
 </div>
 
@@ -760,7 +797,7 @@ onclick="undoAwayGoal()">
 
 <div class="card">
 
-<h2>🔄 Wisselcentrum</h2>
+<h2>CoachAssistent</h2>
 
 <div
 id="nextSwitchTimer"
@@ -778,7 +815,7 @@ color:#2e7d32;
 
 <div id="subAdvice">
 
-Nog geen advies
+Coachadvies verschijnt na voldoende speeltijd.
 
 </div>
 
@@ -840,18 +877,20 @@ Nog niet beschikbaar
 
 <button
 id="downloadReportBtn"
-onclick="downloadMatchReport()"
+onclick="buttonFeedback('downloadReportBtn'); downloadMatchReport()"
 class="hidden"
 style="margin-bottom:10px;">
 📄 Wedstrijdrapport downloaden
 </button>
 
-<button onclick="backToSetup()">
+<button
+id="prepBtn"
+onclick="backToSetup()">
     ⬅ Voorbereiding
 </button>
 
 <div class="watermark">
-    Handbal WisselCoach v1.2 • © 2026 Niels te Heemskerk
+    Handbal WisselCoach v1.3 • © 2026 Niels te Heemskerk
 </div>
 
 </div>
@@ -925,7 +964,7 @@ Sluiten
     <li>Tik op een positie om een speelster te plaatsen of te wisselen.</li>
     <li>De app houdt automatisch speeltijden bij.</li>
     <li>Wissels worden vastgelegd in de wisselhistorie.</li>
-    <li>Het wisselcentrum geeft advies wanneer speelsters achterlopen in speeltijd.</li>
+    <li>De CoachAssistent geeft advies wanneer speelsters achterlopen in speeltijd.</li>
 </ul>
 
 <h3>⚖️ Fair Play</h3>
@@ -983,7 +1022,7 @@ Sluiten
     text-align:center;
     margin-top:15px;
 ">
-    Handbal WisselCoach v1.2<br>
+    Handbal WisselCoach v1.3<br>
     © 2026 Niels te Heemskerk
 </p>
 
@@ -1022,7 +1061,7 @@ overflow-y:auto;
 <script>
 
 /*
-Handbal WisselCoach v1.2
+Handbal WisselCoach v1.3
 © 2026 Niels te Heemskerk
 Alle rechten voorbehouden.
 Ongeoorloofde reproductie of verspreiding is verboden.
@@ -1051,7 +1090,6 @@ let currentLineup = {};
 let substitutionLog = [];
 let playerAvailable = {};
 let currentAdvice = [];
-let adviceCooldownUntil = 0;
 
 let matchArchive = [];
 let matchArchived = false;
@@ -1206,7 +1244,6 @@ positionTimes = {};
 substitutionLog = [];
 currentLineup = {};
 currentAdvice = [];
-adviceCooldownUntil = 0;
 renderPlayers();
 
 document.getElementById("playerProfiles")
@@ -1231,6 +1268,12 @@ document.getElementById(
 document.getElementById(
     "teamName"
 ).value = "";
+
+document.getElementById("matchScreen")
+.classList.add("hidden");
+
+document.getElementById("prepScreen")
+.classList.remove("hidden");
 
 }
 
@@ -1301,50 +1344,62 @@ html += `
 
 <div class="profile-card">
 
-<strong>${player}</strong><br>
+<strong>${player}</strong>
 
-<select
-onchange="
-playerHandedness['${player}']=this.value;
-saveTeam();
+<div style="
+display:flex;
+gap:8px;
+margin-top:10px;
 ">
 
-<option
-value="right"
-${playerHandedness[player] === "right" ? "selected" : ""}>
-Rechtshandig
-</option>
+<button
+style="
+background:#1565c0;
+flex:1;
+padding:6px 8px;
+font-size:13px;
+"
+onclick="
+playerHandedness['${player}']=
+playerHandedness['${player}']==='right'
+? 'left'
+: 'right';
 
-<option
-value="left"
-${playerHandedness[player] === "left" ? "selected" : ""}>
-Linkshandig
-</option>
-
-</select>
-
-<label>
-
-<input
-type="checkbox"
-${playerKeepers[player] ? "checked" : ""}
-onchange="
-playerKeepers['${player}']=this.checked;
+renderProfiles();
 saveTeam();
 "
 >
+${playerHandedness[player]==='left'
+? 'Linkshandig'
+: 'Rechtshandig'}
+</button>
 
-Keeper
+<button
+style="
+background:${playerKeepers[player] ? '#2e7d32' : '#757575'};
+flex:1;
+padding:6px 8px;
+font-size:13px;
+"
+onclick="
+playerKeepers['${player}']=!playerKeepers['${player}'];
 
-</label>
+renderProfiles();
+saveTeam();
+"
+>
+${playerKeepers[player]
+? 'Keeper'
+: 'Geen keeper'}
+</button>
+
+</div>
 
 </div>
 
 `;
         
-}
-
-);
+});
 
     document.getElementById(
         "playerProfiles"
@@ -1404,12 +1459,18 @@ function renderTeam(){
         ${player}
 
 <button
+id="removePlayerBtn_${index}"
 class="remove-player-btn"
-onclick="removePlayer(${index})">
+onclick="
+buttonFeedback('removePlayerBtn_${index}');
+setTimeout(() => {
+    removePlayer(${index});
+},150);
+">
 ✖
 </button>
 
-    </div>
+</div>
     `;
 });
 
@@ -1449,7 +1510,6 @@ substitutionLog = [];
 currentLineup = {};
 positionTimes = {};
 currentAdvice = [];
-adviceCooldownUntil = 0;
 
 document.getElementById("homeScore").innerText = "0";
 document.getElementById("awayScore").innerText = "0";
@@ -1463,7 +1523,7 @@ document.getElementById("substitutionHistory").innerHTML =
 	"Nog geen wissels";
 
 document.getElementById("subAdvice").innerHTML =
-    	"Nog geen advies";
+"Coachadvies verschijnt na voldoende speeltijd.";
 
 document.getElementById("playTimesView").innerHTML =
     	"Nog geen speeltijden";
@@ -1488,20 +1548,30 @@ renderSubstitutionHistory();
 renderSwitchCompass();
 updateFairPlay();
 
+const timerButton =
+document.getElementById(
+    "timerToggleBtn"
+);
+
+if(timerButton){
+
+    timerButton.innerHTML =
+    "▶ Start";
+
+}
+
 }
 
 function startMatch(){
 
 if(
     Object.values(currentLineup)
-    .some(player => player)
+    .filter(Boolean)
+    .length === 6
 ){
-
-document.getElementById("prepScreen").classList.add("hidden");
-
-document.getElementById("matchScreen").classList.remove("hidden");
-
-    	return;
+    document.getElementById("prepScreen").classList.add("hidden");
+    document.getElementById("matchScreen").classList.remove("hidden");
+    return;
 }
 
 homeScore = 0;
@@ -1520,7 +1590,7 @@ document.getElementById("substitutionHistory").innerHTML =
 "Nog geen wissels";
 
 document.getElementById("subAdvice").innerHTML =
-"Nog geen advies";
+"Coachadvies verschijnt na voldoende speeltijd.";
 
 document.getElementById("alertBanner").style.display = "none";
 
@@ -1606,6 +1676,10 @@ updateNextSwitchTimer();
 
 function goalHome(){
 
+buttonFeedback(
+    "homePlusBtn"
+);
+
     homeScore++;
 
     document
@@ -1617,6 +1691,10 @@ function goalHome(){
 }
 
 function goalAway(){
+
+buttonFeedback(
+    "awayPlusBtn"
+);
 
     awayScore++;
 
@@ -1631,6 +1709,10 @@ function goalAway(){
 function undoHomeGoal(){
 
     if(homeScore > 0){
+
+buttonFeedback(
+    "homeMinusBtn"
+);
 
         homeScore--;
 
@@ -1647,6 +1729,10 @@ function undoAwayGoal(){
 
     if(awayScore > 0){
 
+        buttonFeedback(
+            "awayMinusBtn"
+        );
+
         awayScore--;
 
         document
@@ -1658,7 +1744,48 @@ function undoAwayGoal(){
     }
 }
 
+function toggleTimer(){
+
+    buttonFeedback(
+        "timerToggleBtn"
+    );
+
+    if(timerInterval){
+
+        pauseTimer();
+
+    } else {
+
+        startTimer();
+
+    }
+
+}
+
 function startTimer(){
+
+const filledPositions =
+Object.values(currentLineup)
+.filter(player => player)
+.length;
+
+if(filledPositions < 6){
+
+    alert(
+        "Vul eerst alle 6 posities van de opstelling in."
+    );
+
+    return;
+}
+
+if(!currentLineup.keeper){
+
+    alert(
+        "Selecteer eerst een keeper."
+    );
+
+    return;
+}
 
     if(matchSeconds < 1200){
 
@@ -1673,9 +1800,14 @@ function startTimer(){
         ).innerText = "2e Helft";
     }
 
-    if(timerInterval){
-        return;
-    }
+if(timerInterval){
+    return;
+}
+
+document.getElementById(
+    "timerToggleBtn"
+).innerHTML =
+"⏸ Pauze";
     
 timerInterval = setInterval(() => {
 
@@ -1703,6 +1835,11 @@ function pauseTimer(){
 
     saveMatchState();
 
+    document.getElementById(
+        "timerToggleBtn"
+    ).innerHTML =
+    "▶ Start";
+
 }
 
 function showAlertBanner(message){
@@ -1727,6 +1864,7 @@ function showAlertBanner(message){
     }, 5000);
 
 }
+
 function updateTimer(){
 
 const minutes =
@@ -2176,6 +2314,35 @@ function renderSubstitutionHistory(){
 /* HULPFUNCTIES */
 /* ===================================================== */
 
+function buttonFeedback(buttonId){
+
+    const button =
+    document.getElementById(buttonId);
+
+    if(!button){
+        return;
+    }
+
+    button.classList.remove(
+        "button-feedback"
+    );
+
+    void button.offsetWidth;
+
+    button.classList.add(
+        "button-feedback"
+    );
+
+    setTimeout(() => {
+
+        button.classList.remove(
+            "button-feedback"
+        );
+
+    }, 150);
+
+}
+
 function scrollToTop(){
 
     setTimeout(() => {
@@ -2217,7 +2384,10 @@ const emptyIcon =
 
     // Nog geen opstelling ingevuld
 
-if(Object.keys(currentLineup).length === 0){
+if(
+    Object.values(currentLineup)
+    .every(player => !player)
+){
 
     document.getElementById("mKeeper").innerText = "";
     document.getElementById("mPivot").innerText = "";
@@ -2294,45 +2464,19 @@ function calculateSubAdvice(){
         return;
     }
 
-    if(adviceCooldownUntil > matchSeconds){
+const activePlayers =
 
-        const remaining =
-        adviceCooldownUntil - matchSeconds;
-
-        const minutes =
-        Math.floor(remaining / 60);
-
-        const seconds =
-        String(remaining % 60)
-        .padStart(2,"0");
-
-        document.getElementById("subAdvice").innerHTML = `
-            <div style="
-                color:#1565c0;
-                font-weight:bold;
-                margin-bottom:8px;
-            ">
-                ⏳ Recente wissel(s) uitgevoerd
-            </div>
-
-            <div>
-                Volgend advies over
-                ${minutes}:${seconds}
-            </div>
-        `;
-
-        return;
-    }
-
-    const activePlayers =
-    Object.values(currentLineup)
-    .filter(Boolean);
+Object.entries(currentLineup)
+.filter(([position]) => position !== "keeper")
+.map(([,player]) => player)
+.filter(Boolean);
 
     const benchPlayers =
     players.filter(
         player =>
         playerAvailable[player] &&
-        !activePlayers.includes(player)
+        !Object.values(currentLineup)
+.includes(player)
     );
 
     if(benchPlayers.length === 0){
@@ -2483,14 +2627,21 @@ if(playGap < 120){
             </div>
 
 <button
+id="adviceBtn_${i}"
 style="
     width:auto;
     min-width:50px;
     padding:6px 10px;
 "
 onclick="
-    editingPosition='${position}';
-    selectPlayerForPosition('${incoming}');
+    buttonFeedback('adviceBtn_${i}');
+
+    setTimeout(() => {
+
+        editingPosition='${position}';
+        selectPlayerForPosition('${incoming}');
+
+    }, 150);
 "
 >
 ✓
@@ -2519,7 +2670,9 @@ if(currentAdvice.length === 0){
 document.getElementById("subAdvice").innerHTML =
 adviceHtml;
 
-}function updateFairPlay(){
+}
+
+function updateFairPlay(){
 
 const times =
 players
@@ -2553,7 +2706,17 @@ Math.round(diffSeconds / 60);
         "fairPlayStatus"
     );
 
-    if(diffSeconds >= 300){
+if(matchSeconds < 1200){
+
+    status.innerHTML =
+    "⏳ Fair Play beoordeling start na rust";
+
+    status.style.color = "#1565c0";
+
+    return;
+}
+
+    if(diffSeconds >= 600){
 
     status.innerHTML =
     "🔴 Groot verschil: " +
@@ -2563,7 +2726,7 @@ Math.round(diffSeconds / 60);
     status.style.color = "red";
 
 }
-else if(diffSeconds >= 180){
+else if(diffSeconds >= 300){
 
     status.innerHTML =
     "🟠 Let op: " +
@@ -2999,9 +3162,9 @@ ${playTimesHtml}
 
 <tr>
     <th style="width:80px;">Moment</th>
-    <th style="width:180px;">Positie</th>
-    <th style="width:120px;">IN</th>
-    <th style="width:120px;">UIT</th>
+    <th style="width:120px;">Positie</th>
+    <th style="width:90px;">IN</th>
+    <th style="width:90px;">UIT</th>
 </tr>
 
 ${substitutionsHtml}
@@ -3047,6 +3210,11 @@ function downloadArchivedMatch(id){
             (match.playTimes[player] || 0) / 60
         );
 
+const keeperMinutes =
+Math.floor(
+    (match.keeperTime?.[player] || 0) / 60
+);
+
         const labels = {
             keeper:"KP",
             pivot:"CIR",
@@ -3080,7 +3248,14 @@ function downloadArchivedMatch(id){
         playTimesHtml += `
         <tr>
             <td>${player}</td>
-            <td>${minutes} min</td>
+<td>
+    ${minutes} min
+    ${
+        keeperMinutes > 0
+        ? `<br><small> ${keeperMinutes} min keeper</small>`
+        : ""
+    }
+</td>
             <td>${positions.join(", ")}</td>
         </tr>
         `;
@@ -3340,20 +3515,25 @@ const match = {
          JSON.stringify(playerAvailable)
     ),
 
-    playTimes:
-    JSON.parse(
-        JSON.stringify(playTimes)
-    ),
+playTimes:
+JSON.parse(
+    JSON.stringify(playTimes)
+),
 
-    positionTimes:
-    JSON.parse(
-        JSON.stringify(positionTimes)
-    ),
+keeperTime:
+JSON.parse(
+   JSON.stringify(keeperTime)
+),
 
-    substitutions:
-    JSON.parse(
-        JSON.stringify(substitutionLog)
-    )
+positionTimes:
+JSON.parse(
+ JSON.stringify(positionTimes)
+),
+
+substitutions:
+JSON.parse(
+ JSON.stringify(substitutionLog)
+)
 
 };
 
@@ -3400,7 +3580,6 @@ keeperTime,
 positionTimes,
 
 currentAdvice,
-adviceCooldownUntil,
 
 currentLineup,
 substitutionLog,
@@ -3465,7 +3644,6 @@ currentLineup = state.currentLineup || {};
 substitutionLog = state.substitutionLog || [];
 benchCount = state.benchCount || {};
 currentAdvice = state.currentAdvice || [];
-adviceCooldownUntil = state.adviceCooldownUntil || 0;
 
     if(
         confirm(
@@ -3485,6 +3663,7 @@ adviceCooldownUntil = state.adviceCooldownUntil || 0;
         document.getElementById("matchScreen")
         .classList.remove("hidden");
 
+scrollToTop();
 renderPlayers();
 renderSwitchCompass();
 
@@ -3499,12 +3678,19 @@ updateNextSwitchTimer();
 if(
     state.timerRunning &&
     matchSeconds > 0 &&
-    matchSeconds < 2400
+    matchSeconds < 2400 &&
+    Object.values(currentLineup).filter(Boolean).length === 6 &&
+    currentLineup.keeper
 ){
     startTimer();
 }
+else{
+    document.getElementById("timerToggleBtn").innerHTML =
+    "▶ Start";
+}
 
 }
+
 else{
 
     localStorage.removeItem(
@@ -3582,7 +3768,7 @@ function downloadMatchReport(){
                 ${minutes} min
                 ${
                     keeperMinutes > 0
-                    ? `<br><small>🥅 ${keeperMinutes} min keeper</small>`
+                    ? `<br><small>${keeperMinutes} min keeper</small>`
                     : ""
                 }
             </td>
@@ -3794,17 +3980,25 @@ ${fairPlayDiff} min
 
 function backToSetup(){
 
-    document
-    .getElementById("matchScreen")
-    .classList.add("hidden");
+    buttonFeedback(
+        "prepBtn"
+    );
 
-    document
-    .getElementById("prepScreen")
-    .classList.remove("hidden");
+    setTimeout(() => {
 
-scrollToTop();
+        document
+        .getElementById("matchScreen")
+        .classList.add("hidden");
 
-queueSave();
+        document
+        .getElementById("prepScreen")
+        .classList.remove("hidden");
+
+        scrollToTop();
+
+        queueSave();
+
+    }, 120);
 
 }
 
@@ -3839,11 +4033,37 @@ function editPosition(position){
     const currentPlayer =
     currentLineup[position] || "";
 
-    let html =
-    `<div style="margin-bottom:15px;">
-        <strong>${getPositionLabel(position)}</strong>
-    </div>`;
+let html =
+`
+<div style="
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:15px;
+">
 
+    <strong>
+        ${getPositionLabel(position)}
+    </strong>
+
+<button
+    onclick="closePositionEditor()"
+    style="
+        width:32px;
+        height:32px;
+        padding:0;
+        background:transparent;
+        color:#666;
+        border:none;
+        font-size:24px;
+        font-weight:bold;
+    "
+>
+    ×
+</button>
+
+</div>
+`;
 
 if(currentPlayer){
 
@@ -3869,6 +4089,15 @@ players.filter(player =>
     Object.values(currentLineup).includes(player) &&
     player !== currentPlayer
 );
+
+if(
+    benchPlayers.length === 0 &&
+    fieldPlayers.length === 0
+){
+    html += `
+    <p>Geen beschikbare speelsters.</p>
+    `;
+}
 
 html += `
 <h3 style="
@@ -3957,12 +4186,15 @@ ${playerHandedness[player] === "left" ? " • Links" : ""}
         Sluiten
     </button>`;
 
-    document.getElementById("positionEditor").innerHTML =
-    html;
+const editor =
+document.getElementById("positionEditor");
 
-    document
-        .getElementById("positionEditor")
-        .classList.remove("hidden");
+editor.innerHTML = html;
+
+editor.classList.remove("hidden");
+
+editor.scrollTop = 0;
+
 }
 
 function closePositionEditor(){

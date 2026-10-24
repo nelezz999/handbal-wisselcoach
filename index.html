@@ -335,24 +335,20 @@ select{
 
 #infoButton{
     position:absolute;
-    right:10px;
+    right:12px;
     top:50%;
     transform:translateY(-50%);
 
-    width:36px;
-    height:36px;
-
-    border-radius:50%;
+    background:none;
     border:none;
 
-    background:white;
-    color:#002B5C;
+    color:rgba(255,255,255,0.75);
+
+    width:auto;
+    height:auto;
 
     font-size:18px;
-    font-weight:bold;
-
     padding:0;
-    cursor:pointer;
 }
 
 body{
@@ -467,45 +463,67 @@ class="card">
 
     <h2>Teambeheer</h2>
 
-    <label>Opgeslagen teams</label>
+<label>Opgeslagen teams</label>
 
-    <select
+<select
 id="teamSelect"
 onchange="loadSelectedTeam()">
 
-        <option value="">
-            -- Kies team --
-        </option>
+    <option value="">
+        -- Kies team --
+    </option>
 
-    </select>
+</select>
 
-    <br><br>
+<div
+id="activeTeamName"
+style="
+font-weight:bold;
+color:#002B5C;
+margin-top:15px;
+margin-bottom:15px;
+font-size:18px;
+">
+Geen team geladen
+</div>
 
-    <label>Teamnaam</label>
+<input
+type="text"
+id="teamName"
+class="hidden">
 
-    <input
-    type="text"
-    id="teamName"
-    placeholder="Bijv. D1">
+<div style="
+display:flex;
+gap:8px;
+margin-bottom:10px;
+">
 
 <button
 id="saveTeamBtn"
-onclick="buttonFeedback('saveTeamBtn'); saveTeam(true);">
-    Team opslaan
-</button>
-
-<button
-id="archiveBtn"
-onclick="buttonFeedback('archiveBtn'); showArchive();"
-style="background:#1565c0;margin-top:8px;">
-📁 Wedstrijdarchief
+onclick="buttonFeedback('saveTeamBtn'); saveTeam(true);"
+style="flex:1;">
+💾 Opslaan
 </button>
 
 <button
 id="deleteTeamBtn"
 onclick="buttonFeedback('deleteTeamBtn'); deleteTeam();"
-style="background:#c62828; margin-top:8px;">
-    Team verwijderen
+style="
+flex:1;
+background:#757575;
+">
+🗑 Verwijderen
+</button>
+
+</div>
+
+<button
+id="archiveBtn"
+onclick="buttonFeedback('archiveBtn'); showArchive();"
+style="
+background:#1565c0;
+">
+📁 Wedstrijdarchief
 </button>
 
 </div>
@@ -519,7 +537,8 @@ style="background:#c62828; margin-top:8px;">
 
 <div id="selectionContent">
 
-<div id="selectedTeamName"
+<div
+id="selectedTeamName"
 style="
 font-weight:bold;
 color:#002B5C;
@@ -2283,31 +2302,85 @@ function renderSubstitutionHistory(){
     .getElementById("substitutionHistory")
     .innerHTML =
 
-    substitutionLog.map(item =>
+    substitutionLog.map(item => {
 
-    `
-    <div class="history-row">
+        // Positiewijziging
+        if(item.type === "positionChange"){
 
-        <span class="history-minute">
-            ${item.minute}
-        </span>
+            return `
+            <div class="history-row">
 
-        <span class="history-position">
-            ${item.position}
-        </span>
+                <span class="history-minute">
+                    ${item.minute}
+                </span>
 
-        <span class="history-in">
-            IN: ${item.incoming}
-        </span>
+                <span class="history-position">
+                    ${item.player}
+                </span>
 
-        <span class="history-out">
-            UIT: ${item.outgoing}
-        </span>
+                <span class="history-in">
+                    ${item.from}
+                </span>
 
-    </div>
-    `
+                <span class="history-out">
+                    ${item.to}
+                </span>
 
-    ).join("");
+            </div>
+            `;
+        }
+
+        // Lege positie ingevuld vanaf bank
+        if(item.type === "lineupFill"){
+
+            return `
+            <div class="history-row">
+
+                <span class="history-minute">
+                    ${item.minute}
+                </span>
+
+                <span class="history-position">
+                    ${item.position}
+                </span>
+
+                <span class="history-in">
+                    IN: ${item.incoming}
+                </span>
+
+                <span class="history-out">
+                    -
+                </span>
+
+            </div>
+            `;
+        }
+
+        // Normale wissel
+        return `
+        <div class="history-row">
+
+            <span class="history-minute">
+                ${item.minute}
+            </span>
+
+            <span class="history-position">
+                ${item.position}
+            </span>
+
+            <span class="history-in">
+                IN: ${item.incoming}
+            </span>
+
+            <span class="history-out">
+                UIT: ${item.outgoing}
+            </span>
+
+        </div>
+        `;
+
+    }).join("");
+
 }
 
 /* ===================================================== */
@@ -2380,27 +2453,7 @@ function getPositionLabel(position){
 function updateFieldDisplay(){
 
 const emptyIcon =
-'<span style="color:#b0bec5;font-size:18px;">⊕</span>';
-
-    // Nog geen opstelling ingevuld
-
-if(
-    Object.values(currentLineup)
-    .every(player => !player)
-){
-
-    document.getElementById("mKeeper").innerText = "";
-    document.getElementById("mPivot").innerText = "";
-    document.getElementById("mLO").innerText = "";
-    document.getElementById("mRO").innerText = "";
-    document.getElementById("mLH").innerText = "";
-    document.getElementById("mRH").innerText = "";
-
-    document.getElementById("benchPlayers").innerHTML =
-    "Opstelling nog niet ingevuld";
-
-    return;
-}
+'<span style="color:#90a4ae;font-size:28px;font-weight:300;">+</span>';
 
     // Veldposities tonen
 
@@ -2514,7 +2567,7 @@ Object.entries(currentLineup)
                 font-weight:bold;
                 margin-bottom:10px;
             ">
-                ✅ Speeltijden zijn goed in balans
+                Speeltijden zijn goed in balans
             </div>
 
             Geen wisseladvies nodig.
@@ -2660,7 +2713,7 @@ if(currentAdvice.length === 0){
             color:#2e7d32;
             font-weight:bold;
         ">
-            ✅ Geen nuttige wisseladviezen beschikbaar
+            Geen wissels nodig op dit moment.
         </div>
     `;
 
@@ -2709,7 +2762,7 @@ Math.round(diffSeconds / 60);
 if(matchSeconds < 1200){
 
     status.innerHTML =
-    "⏳ Fair Play beoordeling start na rust";
+    "Fair Play beoordeling start na rust";
 
     status.style.color = "#1565c0";
 
@@ -2752,8 +2805,15 @@ function refreshTeamList(){
     const select =
     document.getElementById("teamSelect");
 
-    let html =
-    '<option value="">-- Kies team --</option>';
+   let html = `
+<option value="">
+-- Kies team --
+</option>
+
+<option value="NEW_TEAM">
+Nieuw team...
+</option>
+`;
 
     const teams = [];
 
@@ -2802,9 +2862,33 @@ function loadSelectedTeam(){
         "teamSelect"
     ).value;
 
- if(!teamName){
-    return;
+    // Nieuw team aanmaken
+    if(teamName === "NEW_TEAM"){
 
+        const newTeam =
+        prompt("Teamnaam");
+
+        if(!newTeam){
+
+            document.getElementById(
+                "teamSelect"
+            ).value = "";
+
+            return;
+        }
+
+        document.getElementById(
+            "teamName"
+        ).value =
+        newTeam.trim().toUpperCase();
+
+        saveTeam(true);
+
+        return;
+    }
+
+    if(!teamName){
+        return;
     }
 
     const data =
@@ -2831,31 +2915,36 @@ function loadSelectedTeam(){
     playerAvailable =
     team.playerAvailable || {};
 
-playTimes = {};
-benchCount = {};
-keeperTime = {};
-positionTimes = {};
-substitutionLog = [];
-currentLineup = {};
+    playTimes = {};
+    benchCount = {};
+    keeperTime = {};
+    positionTimes = {};
+    substitutionLog = [];
+    currentLineup = {};
 
     document.getElementById(
-    "teamName"
+        "teamName"
     ).value = teamName;
 
-document.getElementById(
-    "selectedTeamName"
-).innerText =
-"Team: " + teamName;
+    document.getElementById(
+        "activeTeamName"
+    ).innerText =
+    "Team: " + teamName;
+
+    document.getElementById(
+        "selectedTeamName"
+    ).innerText =
+    "Team: " + teamName;
 
     renderPlayers();
 
-document
-.getElementById("selectionContent")
-.classList.add("hidden");
+    document
+    .getElementById("selectionContent")
+    .classList.add("hidden");
 
-document
-.getElementById("profilesContent")
-.classList.add("hidden");
+    document
+    .getElementById("profilesContent")
+    .classList.add("hidden");
 
     renderSwitchCompass();
 
@@ -4073,7 +4162,7 @@ margin-bottom:12px;
 color:#1565c0;
 font-weight:bold;
 ">
-✅ ${currentPlayer} (huidig)
+${currentPlayer} (huidig)
 </div>`;
 }
 
@@ -4212,52 +4301,136 @@ function selectPlayerForPosition(player){
         pos => currentLineup[pos] === player
     );
 
-const outgoing =
-currentLineup[editingPosition] || "";
+    const outgoing =
+    currentLineup[editingPosition] || "";
 
+    // Veldspeelster verplaatst naar LEGE positie
     if(
         existingPosition &&
-        existingPosition !== editingPosition
+        existingPosition !== editingPosition &&
+        !outgoing
     ){
+
+        substitutionLog.unshift({
+
+            type: "positionChange",
+
+            minute:
+            String(
+                Math.floor(matchSeconds / 60)
+            ).padStart(2,"0") + "'",
+
+            player: player,
+
+            from:
+            getPositionLabel(existingPosition),
+
+            to:
+            getPositionLabel(editingPosition)
+
+        });
+
         currentLineup[existingPosition] = "";
+
+    }
+
+    // Veldspeelster verplaatst naar BEZETTE positie
+    else if(
+        existingPosition &&
+        existingPosition !== editingPosition &&
+        outgoing
+    ){
+
+        substitutionLog.unshift({
+
+            type: "substitution",
+
+            minute:
+            String(
+                Math.floor(matchSeconds / 60)
+            ).padStart(2,"0") + "'",
+
+            position:
+            getPositionLabel(editingPosition),
+
+            incoming: player,
+            outgoing: outgoing
+
+        });
+
+        currentLineup[existingPosition] = "";
+
+    }
+
+    // Bankspeler vult lege positie
+    else if(
+        !existingPosition &&
+        !outgoing &&
+        matchSeconds > 0
+    ){
+
+        substitutionLog.unshift({
+
+            type: "lineupFill",
+
+            minute:
+            String(
+                Math.floor(matchSeconds / 60)
+            ).padStart(2,"0") + "'",
+
+            position:
+            getPositionLabel(editingPosition),
+
+            incoming: player
+
+        });
+
+    }
+
+    // Normale wissel
+    else if(
+        !existingPosition &&
+        outgoing &&
+        outgoing !== player
+    ){
+
+        substitutionLog.unshift({
+
+            type: "substitution",
+
+            minute:
+            String(
+                Math.floor(matchSeconds / 60)
+            ).padStart(2,"0") + "'",
+
+            position:
+            getPositionLabel(editingPosition),
+
+            incoming: player,
+            outgoing: outgoing
+
+        });
+
     }
 
     currentLineup[editingPosition] = player;
 
-if(outgoing && outgoing !== player){
-
-    substitutionLog.unshift({
-
-        minute:
-        String(
-            Math.floor(matchSeconds/60)
-        ).padStart(2,"0") + "'",
-
-        position:
-        getPositionLabel(editingPosition),
-
-        incoming: player,
-        outgoing: outgoing
-
-    });
-
     renderSubstitutionHistory();
-}
 
-currentAdvice =
-currentAdvice.filter(
-    advice =>
-    !(
-        advice.incoming === player &&
-        advice.position === editingPosition
-    )
-);
+    currentAdvice =
+    currentAdvice.filter(
+        advice =>
+        !(
+            advice.incoming === player &&
+            advice.position === editingPosition
+        )
+    );
 
-updateFieldDisplay();
-calculateSubAdvice();
-updateFairPlay();
-queueSave();
-closePositionEditor();
+    updateFieldDisplay();
+    calculateSubAdvice();
+    updateFairPlay();
+    queueSave();
+    closePositionEditor();
 
 }
 

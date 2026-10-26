@@ -3798,43 +3798,47 @@ else{
 
 function downloadMatchReport(){
 
-    const today = new Date().toLocaleDateString("nl-NL");
+    const today =
+    new Date().toLocaleDateString("nl-NL");
 
     const homeTeam =
-    document.getElementById("homeTeamLabel").innerText;
+    document.getElementById(
+        "homeTeamLabel"
+    ).innerText;
 
     const awayTeam =
-    document.getElementById("awayTeamLabel").innerText;
+    document.getElementById(
+        "awayTeamLabel"
+    ).innerText;
+
+    const availablePlayers =
+    players.filter(
+        player => playerAvailable[player]
+    );
+
+    const labels = {
+        keeper:"KP",
+        pivot:"CIR",
+        leftBack:"LO",
+        rightBack:"RO",
+        leftCorner:"LH",
+        rightCorner:"RH"
+    };
 
     let playTimesHtml = "";
 
-    players
-    .filter(player => playerAvailable[player])
-    .forEach(player => {
+    availablePlayers.forEach(player => {
 
-        const minutes =
+        const totalMinutes =
         Math.floor(
             getTotalPlayTime(player) / 60
         );
 
-        const keeperMinutes =
-        Math.floor(
-            getKeeperTime(player) / 60
-        );
-
         let positions = [];
 
-        const labels = {
-            keeper:"KP",
-            pivot:"CIR",
-            leftBack:"LO",
-            rightBack:"RO",
-            leftCorner:"LH",
-            rightCorner:"RH"
-        };
-
-        Object.entries(positionTimes[player] || {})
-        .forEach(([position,time]) => {
+        Object.entries(
+            positionTimes[player] || {}
+        ).forEach(([position,time]) => {
 
             if(time > 0){
 
@@ -3852,49 +3856,17 @@ function downloadMatchReport(){
         playTimesHtml += `
         <tr>
             <td>${player}</td>
-
-            <td>
-                ${minutes} min
-                ${
-                    keeperMinutes > 0
-                    ? `<br><small>${keeperMinutes} min keeper</small>`
-                    : ""
-                }
-            </td>
-
-            <td>${positions.join(", ")}</td>
+            <td>${totalMinutes} min</td>
+            <td>${positions.join(" • ")}</td>
         </tr>
         `;
 
     });
 
-    let substitutionsHtml = "";
-
-    if(substitutionLog.length){
-
-        substitutionsHtml = substitutionLog
-        .slice()
-        .reverse()
-        .map(item => `
-            <tr>
-                <td>${item.minute}</td>
-                <td>${item.position}</td>
-                <td>${item.incoming}</td>
-                <td>${item.outgoing}</td>
-            </tr>
-        `)
-        .join("");
-
-    } else {
-
-        substitutionsHtml =
-        `<tr><td colspan="4">Geen wissels</td></tr>`;
-    }
-
     const allTimes =
-    players
-    .filter(player => playerAvailable[player])
-    .map(player => getTotalPlayTime(player));
+    availablePlayers.map(
+        player => getTotalPlayTime(player)
+    );
 
     const maxPlay =
     allTimes.length
@@ -3907,43 +3879,176 @@ function downloadMatchReport(){
     : 0;
 
     const fairPlayDiff =
-    Math.floor((maxPlay - minPlay) / 60);
+    Math.floor(
+        (maxPlay - minPlay) / 60
+    );
 
-    let fairPlayLabel = "🟢 Goed";
+    let fairPlayLabel =
+    "Goed verdeeld";
 
     if(fairPlayDiff >= 10){
-
-        fairPlayLabel = "🔴 Groot verschil";
-
+        fairPlayLabel =
+        "Groot verschil";
     }
     else if(fairPlayDiff >= 5){
+        fairPlayLabel =
+        "Let op";
+    }
 
-        fairPlayLabel = "🟠 Let op";
+    const highestPlayer =
+    availablePlayers.find(
+        player =>
+        getTotalPlayTime(player) === maxPlay
+    ) || "-";
 
+    const lowestPlayer =
+    availablePlayers.find(
+        player =>
+        getTotalPlayTime(player) === minPlay
+    ) || "-";
+
+    // =====================================================
+    // Positieverdeling
+    // =====================================================
+
+    let positionSummaryHtml = "";
+
+    Object.entries(labels)
+    .forEach(([position,label]) => {
+
+        const entries = [];
+
+        availablePlayers.forEach(player => {
+
+            const seconds =
+            (positionTimes[player] || {})[position] || 0;
+
+            if(seconds > 0){
+
+                entries.push(
+                    `${player} - ${Math.floor(seconds/60)} min`
+                );
+
+            }
+
+        });
+
+        if(entries.length){
+
+            positionSummaryHtml += `
+            <h3>${label}</h3>
+            <ul>
+                ${entries.map(
+                    entry => `<li>${entry}</li>`
+                ).join("")}
+            </ul>
+            `;
+        }
+
+    });
+
+    // =====================================================
+    // Wisselhistorie
+    // =====================================================
+
+    let substitutionsHtml = "";
+
+    if(substitutionLog.length){
+
+        substitutionsHtml =
+        substitutionLog
+        .slice()
+        .reverse()
+        .map(item => {
+
+            if(item.type === "positionChange"){
+
+                return `
+                <tr>
+                    <td>${item.minute}</td>
+                    <td>${item.player}</td>
+                    <td>${item.from}</td>
+                    <td>${item.to}</td>
+                </tr>
+                `;
+            }
+
+            if(item.type === "lineupFill"){
+
+                return `
+                <tr>
+                    <td>${item.minute}</td>
+                    <td>${item.position}</td>
+                    <td>${item.incoming}</td>
+                    <td>-</td>
+                </tr>
+                `;
+            }
+
+            return `
+            <tr>
+                <td>${item.minute}</td>
+                <td>${item.position}</td>
+                <td>${item.incoming}</td>
+                <td>${item.outgoing}</td>
+            </tr>
+            `;
+
+        }).join("");
+
+    }
+    else{
+
+        substitutionsHtml = `
+        <tr>
+            <td colspan="4">
+                Geen wissels
+            </td>
+        </tr>
+        `;
     }
 
     const report = `
 <!DOCTYPE html>
 <html lang="nl">
+
 <head>
+
 <meta charset="UTF-8">
 
 <title>Wedstrijdrapport</title>
 
 <style>
 
-h1,h2{
+body{
+    font-family:Arial,sans-serif;
+    max-width:1000px;
+    margin:auto;
+    padding:20px;
+}
+
+h1{
     color:#002B5C;
+    border-bottom:3px solid #FF7A00;
+    padding-bottom:8px;
+}
+
+h2{
+    color:#002B5C;
+    border-bottom:2px solid #FF7A00;
+    padding-bottom:4px;
+    margin-top:30px;
 }
 
 table{
     width:100%;
     border-collapse:collapse;
-    margin-bottom:20px;
+    margin-top:10px;
+    margin-bottom:15px;
 }
 
 th,td{
-    border:1px solid #ccc;
+    border:1px solid #d0d7de;
     padding:8px;
     text-align:left;
 }
@@ -3953,9 +4058,17 @@ th{
 }
 
 .result{
-    font-size:22px;
+    font-size:24px;
     font-weight:bold;
+    color:#002B5C;
     margin-bottom:20px;
+}
+
+.summary{
+    background:#f7f9fc;
+    padding:12px;
+    border-radius:8px;
+    margin-top:10px;
 }
 
 </style>
@@ -3964,27 +4077,17 @@ th{
 
 <body>
 
-<h1>🏐 Wedstrijdrapport</h1>
-
-<p>
-<strong>Datum:</strong> ${today}
-</p>
-
-<p>
-<strong>Wedstrijd:</strong>
-${homeTeam} - ${awayTeam}
-</p>
+<h1>Handbal WisselCoach - Wedstrijdrapport</h1>
 
 <div class="result">
 ${homeTeam} ${homeScore} - ${awayScore} ${awayTeam}
 </div>
 
 <p>
-<strong>Aantal wissels:</strong>
-${substitutionLog.length}
+<strong>Datum:</strong> ${today}
 <br>
-<strong>Aantal aanwezige speelsters:</strong>
-${players.filter(player => playerAvailable[player]).length}
+<strong>Aanwezig:</strong>
+${availablePlayers.length} speelsters
 </p>
 
 <h2>Speeltijden</h2>
@@ -3993,7 +4096,7 @@ ${players.filter(player => playerAvailable[player]).length}
 
 <tr>
     <th>Speelster</th>
-    <th>Speeltijd</th>
+    <th>Totaal</th>
     <th>Posities</th>
 </tr>
 
@@ -4001,48 +4104,57 @@ ${playTimesHtml}
 
 </table>
 
+<div class="summary">
+
+<strong>
+Fair Play: ${fairPlayLabel}
+</strong>
+
+<br><br>
+
+Hoogste speeltijd:
+${highestPlayer}
+(${Math.floor(maxPlay/60)} min)
+
+<br>
+
+Laagste speeltijd:
+${lowestPlayer}
+(${Math.floor(minPlay/60)} min)
+
+<br>
+
+Verschil:
+${fairPlayDiff} min
+
+</div>
+
+<h2>Positieverdeling</h2>
+
+${positionSummaryHtml}
+
 <h2>Wisselhistorie</h2>
 
 <table>
 
 <tr>
-    <th>Moment</th>
-    <th>Positie</th>
-    <th>IN</th>
-    <th>UIT</th>
+    <th>Minuut</th>
+    <th>Positie / Speelster</th>
+    <th>IN / Van</th>
+    <th>UIT / Naar</th>
 </tr>
 
 ${substitutionsHtml}
 
 </table>
 
-<h2>Fair Play Analyse</h2>
-
-<p>
-<strong>Status:</strong>
-${fairPlayLabel}
-
-<br><br>
-
-Max speeltijd:
-${Math.floor(maxPlay/60)} min
-
-<br>
-
-Min speeltijd:
-${Math.floor(minPlay/60)} min
-
-<br>
-
-Verschil:
-${fairPlayDiff} min
-</p>
-
 </body>
+
 </html>
 `;
 
-    const blob = new Blob(
+    const blob =
+    new Blob(
         [report],
         {type:"text/html"}
     );
@@ -4065,6 +4177,7 @@ ${fairPlayDiff} min
     link.click();
 
     URL.revokeObjectURL(link.href);
+
 }
 
 function backToSetup(){
